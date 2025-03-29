@@ -1,0 +1,126 @@
+1. Print "Hello, World!" using BIOS INT 10h
+- Use real-mode 16-bit assembly to print text one character at a time.
+- Bonus: Center the text on the screen using cursor positioning.
+Goal: Learn basic BIOS video output and memory layout.
+
+2. Display CPU register values (AX, BX, CX, DX)
+- Move known values into registers and display them in hexadecimal.
+- Convert binary to ASCII manually.
+Goal: Practice register handling and ASCII conversion.
+
+3. Change the video mode to 13h and fill the screen with a color gradient
+- Use INT 10h to set video mode.
+- Write to video memory (0xA000) to create a color pattern.
+Goal: Learn direct memory access and video mode switching.
+
+4. Read sector #2 from disk using INT 13h
+- Load the sector into memory (e.g., 0x0500).
+- Print the loaded message from that sector.
+Goal: Understand BIOS disk I/O and memory targeting.
+
+5. Chainload a second-stage bootloader
+- Read another bootloader from disk and jump to it.
+Goal: Simulate multistage booting and control flow transfer.
+
+6. Parse the FAT12 filesystem and display a file
+- Read file system structures.
+- Locate and print a file like HELLO.TXT.
+Goal: Learn basic file system parsing in real mode.
+
+7. Show total memory using BIOS INT 12h or INT 15h
+- Retrieve and display total conventional memory.
+Goal: Access BIOS-level system information.
+
+8. Implement keyboard input with INT 16h
+- Read key presses and echo them to the screen.
+Goal: Work with BIOS keyboard services and real-time input.
+
+9. Draw a fake boot menu using ASCII box drawing
+- Use characters to create a UI-style menu.
+Goal: Learn screen positioning and layout in text mode.
+
+10. Build a boot menu that responds to user input
+- Let user pick between options using 1/2 keys.
+- Display different messages based on choice.
+Goal: Practice user interaction and logic branching.
+
+11. Add a password prompt before continuing
+- Ask user to input a password.
+- Only continue booting if password is correct.
+Goal: Simulate security check using string input.
+
+12. Print a hex dump of memory starting at a known address
+- Dump bytes in readable format with addresses.
+Goal: Understand memory layout and hex representation.
+
+13. Implement screen scrolling as text fills bottom line
+- Shift text up when screen buffer is full.
+Goal: Learn to manage screen memory or use scrolling interrupts.
+
+14. Show a loading animation or spinner
+- Cycle through characters like | / - \.
+Goal: Practice loops and timing in boot code.
+
+15. Create a timer or counter triggered by key press
+- Increment and display a counter every time a key is pressed.
+Goal: Combine input handling with logic and display.
+
+16. Draw lines or boxes using ASCII
+- Horizontally or vertically render a border or frame.
+Goal: Improve cursor control and visual output.
+
+17. Display a boot logo made with ASCII art
+- Show a creative boot splash before booting kernel.
+Goal: Combine string printing and layout skills.
+
+18. Simulate an error screen (e.g., 'OS Not Found')
+- Show a fake error then continue to real kernel.
+Goal: Understand how to manipulate user expectations or simulate errors.
+
+19. Handle editable input (support backspace)
+- Allow user to delete characters while typing.
+Goal: Implement basic command line editing behavior.
+
+20. Fake a BIOS setup screen
+- Create a UI with options (non-functional).
+Goal: Simulate real system interfaces using pure BIOS output.
+
+21. Detect multiple disk drives
+- Use INT 13h AH=08 to query drive count.
+Goal: Practice using BIOS to access hardware info.
+
+22. Save user input to memory and later retrieve it
+- Read and store a name, then display it later.
+Goal: Use RAM as temporary storage within bootloader.
+
+23. Build a basic calculator
+- Accept two digits and an operator, show result.
+Goal: Practice parsing, math, and control flow in real mode.
+
+24. Load and jump to multiple binaries
+- Let user pick which kernel or program to load.
+Goal: Manage code flow and user-directed execution.
+
+25. Read time from BIOS using INT 1Ah
+- Show current hour and minute.
+Goal: Use real-time clock functions from BIOS.
+
+26. Create a fake command shell
+- Let user type a command and echo a canned response.
+Goal: Simulate command processing without real parsing.
+
+27. Typing speed test
+- Show a target string and measure how fast user types it.
+Goal: Combine timer, input, and comparison logic.
+
+28. Flash screen colors in graphics mode
+- Continuously update video memory with new colors.
+Goal: Experiment with animation and video RAM access.
+
+29. Implement boot delay/countdown
+- Show countdown from 5 to 0, then continue.
+Goal: Use time delay and visual feedback.
+
+30. Add a 'Safe Mode' boot option
+- When selected, skip parts of boot code or configs.
+Goal: Practice conditional branching and boot modes.
