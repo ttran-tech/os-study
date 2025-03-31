@@ -5,6 +5,22 @@
 [ORG 0x7C00] ; tell NASM the starting address
 
 start:
+    jmp 0:reset_segment_registers
+
+reset_segment_registers:
+    cli ; disable interrupt when reseting registers
+    mov ax, 0x0000
+    ; set all segment registers to 0
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov fs, ax
+    mov es, ax
+    mov sp, 0x7c00 ; set up stack starts at 0x7c00
+
+    sti ; re-enable interrupt
+
+print_char:
     mov ah, 0eh ; 0x0e - write Character in TTY Mode
     mov al, 41h ; output character
     mov bx, 0 ; set page number and foreground color to 0
