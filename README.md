@@ -11,10 +11,11 @@ A collection of ASM and C snippet while I study on operating system
 
 ## Global Descriptor Table (GDT)
 - GDT is a ***blueprint*** that tells the CPU how to configure memory segments before switching to Protected Mode.
+- A GDT Entry is 8 bytes long or 64 bits total.
 
 ### GDT Entry Layout (8 Bytes Total)
 
-| Byte #| Field| Bits| Description|
+| Byte #| Field| Bit Range| Description|
 |---|---|---|---|
 | 0-1| Limit| 16 (0-15)| Lower 16 bits of segment limit|
 | 2-3| Base| 16 (0-15)| Lower 16 bits of base address|
@@ -23,6 +24,83 @@ A collection of ASM and C snippet while I study on operating system
 | 6| Limit| 4| High 4 bits of segment limit|
 | 7| Flags| 4| G, D/B|
 | 8| Base| 8 (24-31)| High 8 bits of base address|
+
+<table>
+  <tr>
+    <th>Byte</th>
+    <th>Bit Range</th>
+    <th>Bits</th>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+### Bit-by-Bit Layout
+
+
 
 ### Descriptor Privilege Level (DPL)
 - DPL is a 2-bit field inside a GDT entry which defines who is allowed to access a particular segment.
