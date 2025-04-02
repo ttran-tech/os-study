@@ -25,82 +25,44 @@ A collection of ASM and C snippet while I study on operating system
 | 7| Flags| 4| G, D/B|
 | 8| Base| 8 (24-31)| High 8 bits of base address|
 
-<table>
-  <tr>
-    <th>Byte</th>
-    <th>Bit Range</th>
-    <th>Bits</th>
-    <th>Name</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>
 
 ### Bit-by-Bit Layout
-
-
+<table>
+  <tr>
+    <th></th>
+    <td>LIMIT (Low)</td>
+    <td colspan="2">BASE ADDRESS (Low/Middle)</td>
+    <td colspan="4">ACCESS BYTE</td>
+    <td>LIMIT (High)</td>
+    <td colspan="4">FLAGS</td>
+    <td>BASE ADDRESS (High)</td>
+  </tr>
+  <tr>
+    <th>Name</th>
+    <td>Limit Low</td>
+    <td>Base Low</td>
+    <td>Base Middle</td>
+    <td>Present (P)</td>
+    <td>DPL</td>
+    <td>Descriptor Type</td>
+    <td>Segment Type</td>
+    <td>Limit High</td>
+    <td>Granularity (G)</td>
+    <td>Size (D/B)</td>
+    <td>Long Mode (L)</td>
+    <td>AVL</td>
+    <td>Base High</td>
+  </tr>
+  <tr>
+    <th>Bit Range</th><td>0-15</td><td>16-31</td><td>32-39</td><td>47</td><td>46-45</td><td>44</td><td>43-40</td><td>48-51</td><td>55</td><td>54</td><td>53</td><td>52</td><td>56-63</td>
+  </tr>
+  <tr>
+    <th>Byte #</th><td>0 - 1</td><td>2 - 3</td><td>4</td><td colspan="4">5</td><td>6</td><td colspan="4">7</td><td>8</td>
+  </tr>
+  <tr>
+    <th>Bits</th><td>16</td><td>16</td><td>8</td><td colspan="4">8</td><td>4</td><td colspan="4">4</td><td>8</td>
+  </tr>
+</table>
 
 ### Descriptor Privilege Level (DPL)
 - DPL is a 2-bit field inside a GDT entry which defines who is allowed to access a particular segment.
