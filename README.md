@@ -1,6 +1,9 @@
 # Operating System :computer:
 A collection of notes and experiment codes I do when studied about Operating System.
 
+## Bits & Bytes
+![image](https://github.com/user-attachments/assets/969dd630-4c19-46bd-b924-47b337200e25)
+
 ## x86 Type & Size
 | Type| Meaning| Size|
 |---|---|---|
@@ -65,7 +68,7 @@ A collection of notes and experiment codes I do when studied about Operating Sys
 
 ### :large_blue_diamond: Segment Limit (20 bits)
 - The **Segment Limit** deines the size of the segment (or how far memory can go from the **base address**).
-- In GDT Entry, segment limit is 20 bits long and split into:
+- In GDT, segment limit is 20 bits entry and split into:
     1. Lower 16 bits → LIMIT LOW (bit range: 0-15)
     2. Upper 4 bits → LIMIT HIGH (bit range: 48-51) *This field is combine with FLAGS field and makes up an 8-bit field total*
 - **How Granularity (G bit) affects Segment Limit?
@@ -86,7 +89,12 @@ A collection of notes and experiment codes I do when studied about Operating Sys
     ```
 
 ### :large_blue_diamond: Base Address (32 bits)
-
+- The **Base Address** tells the CPU where the segment begins in linear memory.
+- In GDT, base address is a 32-bit entry and split into:
+  1. Lower 16 bits → BASE LOW (bit range: 16-31) *A lower 2 bytes of a 32-bit address*
+  2. Middle 8 bits → BASE MIDDLE (bit range: 32-39) *Next byte of the address*
+  3. Upper 8 bits → BASE HIGH (bit range: 56-63) *Final byte of the address*
+- Together, they form a full 32-bit linear address of the segment's starting point.
 
 ### :large_blue_diamond: Access Byte (8 bits)
 
