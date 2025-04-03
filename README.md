@@ -97,6 +97,34 @@ A collection of notes and experiment codes I do when studied about Operating Sys
 - Together, they form a full 32-bit linear address of the segment's starting point.
 
 ### :large_blue_diamond: Access Byte (8 bits)
+- The **Access Byte** defines:
+  - Whether segment is **present (Present - P)**
+  - Its **privilege level (Descriptor Privilege Level - DPL)**
+  - If it is **Code/Data or System segment (Descriptor Type - S)**
+  - What kind of operations are allowed: **Read, Write, Execute (Segment Type - T)**
+- Access Byte breakdown:
+
+  | Bit Range| Name| Description| Bit|
+  |---|---|---|---|
+  | 47| Present (P)| Set to **1** if the segment is valid and present in memory| 1|
+  | 46-48| DPL| 2-bit value: **00** = Ring 0, **11** = Ring 3| 2|
+  | 44| Descriptor Type (S)| **1** = Code/Data segment, **0** = System segment| 1|
+  | 43-40| Segment Type (T)| Varies by segment (Read/Write/Execute flags)| 4|
+
+ - Bit-Level view:
+
+   | Bit| 7| 6| 5| 4| 3| 2| 1| 0|
+   |---|---|---|---|---|---|---|---|---|
+   | Field| P| DPL1| DPL0| S| T3| T2| T1| T0|
+
+- Common Access Byte setting:
+
+  | Segment| Binary| Hex| Meaning|
+  |---|---|---|---|
+  | Code (RX, Ring 0)| 10011010| 0x9A| Present, DPL = 0, Readable-Executable|
+  | Data (RW, Ring 0)| 10010010| 0x92| Present, DPL = 0, Readable-Writable|
+  | Code (RX, Ring 3)| 11111010| 0xFA| Present, DPL = 3, Readable-Executable|
+  | Data (RW, Ring 3)| 11110010| 0xF2| Present, DPL = 3, Readable-Writable|
 
 #### :small_orange_diamond: Descriptor Privilege Level (DPL)
 - DPL is a 2-bit field inside a GDT entry which defines who is allowed to access a particular segment.
