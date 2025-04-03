@@ -1,9 +1,11 @@
 # Operating System :computer:
 A collection of notes and experiment codes I do when studied about Operating System.
 
+---
 ## Bits & Bytes
 ![image](https://github.com/user-attachments/assets/969dd630-4c19-46bd-b924-47b337200e25)
 
+---
 ## x86 Type & Size
 | Type| Meaning| Size|
 |---|---|---|
@@ -12,6 +14,7 @@ A collection of notes and experiment codes I do when studied about Operating Sys
 | dd| Doubleword| 4 bytes (32 bits)|
 | dq| Quadword| 8 bytes (64 bits)|
 
+---
 ## Global Descriptor Table (GDT)
 - GDT is a ***blueprint*** that tells the CPU how to configure memory segments before switching to Protected Mode.
 - A GDT Entry is 8 bytes long or 64 bits total.
@@ -58,6 +61,7 @@ A collection of notes and experiment codes I do when studied about Operating Sys
   </tr>
 </table>
 
+---
 ### :large_blue_diamond: Type of Descriptors
 1. Code Segment Descriptor
     - Defines a segment containing executable code
@@ -66,6 +70,7 @@ A collection of notes and experiment codes I do when studied about Operating Sys
 3. System Segment Descriptor
     - Defines system segments used by the OS
 
+---
 ### :large_blue_diamond: Segment Limit (20 bits)
 - The **Segment Limit** deines the size of the segment (or how far memory can go from the **base address**).
 - In GDT, segment limit is 20 bits entry and split into:
@@ -88,6 +93,7 @@ A collection of notes and experiment codes I do when studied about Operating Sys
                            = 4 GB
     ```
 
+---
 ### :large_blue_diamond: Base Address (32 bits)
 - The **Base Address** tells the CPU where the segment begins in linear memory.
 - In GDT, base address is a 32-bit entry and split into:
@@ -96,6 +102,7 @@ A collection of notes and experiment codes I do when studied about Operating Sys
   3. Upper 8 bits → BASE HIGH (bit range: 56-63) *Final byte of the address*
 - Together, they form a full 32-bit linear address of the segment's starting point.
 
+---
 ### :large_blue_diamond: Access Byte (8 bits)
 - The **Access Byte** defines:
   - Whether segment is **present (Present - P)**
@@ -126,6 +133,7 @@ A collection of notes and experiment codes I do when studied about Operating Sys
   | Code (RX, Ring 3)| 11111010| 0xFA| Present, DPL = 3, Readable-Executable|
   | Data (RW, Ring 3)| 11110010| 0xF2| Present, DPL = 3, Readable-Writable|
 
+---
 #### :small_orange_diamond: Descriptor Privilege Level (DPL)
 - DPL is a 2-bit field inside a GDT entry which defines who is allowed to access a particular segment.
 - DPL is part of the Access Byte, which is 5th byte (byte 5) in GDT entry (see GDT Entry Layout)
@@ -145,4 +153,5 @@ A collection of notes and experiment codes I do when studied about Operating Sys
   - The CPU compares CPL, DPL, and RPL to decide if access is allowed:
     - If not → General Protection Fault.
 
+---
 ### :large_blue_diamond: FLAGS (4 bits) or Limit High + FLAGS (8 bits)
