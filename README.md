@@ -169,6 +169,9 @@ A collection of notes and experiment codes I do when studied about Operating Sys
   - Allows CPU to use linear addresses beyond 1 MB (0x00100000 (1MB+) and beyond).
 
 ```Assembly
+; Source: https://wiki.osdev.org/A20_Line#Fast_A20_Gate
+; Modified by ttran.tech
+; Test A20 and set if A20 does not set.
 [bits 32]
 
 start_protected_mode:
@@ -180,9 +183,6 @@ enable_A20:	; enable A20 if A20 line is cleared
 	out 0x92, al
 	jmp is_A20_on? ; re-test A20 line
 
-; Credit: A20 Line Testing written by Elad Ashkcenazi
-; Source: https://wiki.osdev.org/A20_Line#Fast_A20_Gate
-; Modified by ttran.tech
 is_A20_on?:
 	pushad
 	mov edi,0x112345  ;odd megabyte address.
