@@ -159,5 +159,43 @@ A collection of notes and experiment codes I do when studied about Operating Sys
 ---
 ### :large_blue_diamond: Enable A20 Line
 
+- The **A20 Line** is the 21st address line on x86 CPUs which allows access to memory above 1 MB (0xFFFFF).
+
+- Why was A20 originally disabled?
+  - For backward compatibility with Real Mode software, A20 line was disabled originally.
+
+- Why enable A20 in Protected Mode?
+  - Protected Mode requires access to memory above 1 MB → A20 line must be enabled.
+  - Allows CPU to use linear addresses beyond 1 MB (0x00100000 (1MB+) and beyond).
+
+```Assembly
+[bits 32]
+
+start_protected_mode:
+	jmp is_A20_on? ; test for A20 line when starting Protected Mode
+
+enable_A20:	; enable A20 if A20 line is cleared
+	in al, 0x92
+	or al, 2
+	out 0x92, al
+	jmp is_A20_on? ; re-test A20 line
+
+; Credit: A20 Line Testing written by Elad Ashkcenazi
+; Source: https://wiki.osdev.org/A20_Line#Fast_A20_Gate
+; Modified by ttran.tech
+is_A20_on?:
+	pushad
+	mov edi,0x112345  ;odd megabyte address.
+	mov esi,0x012345  ;even megabyte address.
+	mov [esi],esi     ;making sure that both addresses contain diffrent values.
+	mov [edi],edi     ;(if A20 line is cleared the two pointers would point to the address 0x012345 that would contain 0x112345 (edi)) 
+	cmpsd             ;compare addresses to see if the're equivalent.
+	popad
+	jne A20_on        ;if not equivalent , A20 line is set.
+	jmp enable_A20    ;if equivalent, the A20 line is cleared, jmp to enable_A20.
+	
+A20_on:
+	; do others task here
+```
 ---
 ### :large_blue_diamond: Cross Compiler
