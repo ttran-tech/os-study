@@ -13,19 +13,6 @@ A collection of ASM and C snippet while I study on operating system
 - GDT is a ***blueprint*** that tells the CPU how to configure memory segments before switching to Protected Mode.
 - A GDT Entry is 8 bytes long or 64 bits total.
 
-### GDT Entry Layout (8 Bytes Total)
-
-| Byte #| Field| Bit Range| Description|
-|---|---|---|---|
-| 0-1| Limit| 16 (0-15)| Lower 16 bits of segment limit|
-| 2-3| Base| 16 (0-15)| Lower 16 bits of base address|
-| 4| Base| 8 (16-23)| Middle 8 bits of base address|
-| 5| Access Byte| 8| 8 bits contain DPL, segment type, and flags|
-| 6| Limit| 4| High 4 bits of segment limit|
-| 7| Flags| 4| G, D/B|
-| 8| Base| 8 (24-31)| High 8 bits of base address|
-
-
 ### Bit-by-Bit Layout
 <table>
   <tr>
