@@ -1,5 +1,5 @@
-# os-study
-A collection of ASM and C snippet while I study on operating system
+# Operating System :computer:
+A collection of notes and experiment codes I do when studied about Operating System.
 
 ## x86 Type & Size
 | Type| Meaning| Size|
@@ -12,8 +12,12 @@ A collection of ASM and C snippet while I study on operating system
 ## Global Descriptor Table (GDT)
 - GDT is a ***blueprint*** that tells the CPU how to configure memory segments before switching to Protected Mode.
 - A GDT Entry is 8 bytes long or 64 bits total.
+  
+    ```
+    Segmen Limit + Base + Access Byte + Flags = 64 bits
+    ```
 
-### Bit-by-Bit Layout
+### :large_blue_diamond: Bit-by-Bit Layout
 <table>
   <tr>
     <th></th>
@@ -51,7 +55,42 @@ A collection of ASM and C snippet while I study on operating system
   </tr>
 </table>
 
-### Descriptor Privilege Level (DPL)
+### :large_blue_diamond: Type of Descriptors
+1. Code Segment Descriptor
+    - Defines a segment containing executable code
+2. Data Segment Descriptor
+    - Defines a segment containing data
+3. System Segment Descriptor
+    - Defines system segments used by the OS
+
+### :large_blue_diamond: Segment Limit (20 bits)
+- The **Segment Limit** deines the size of the segment (or how far memory can go from the **base address**).
+- In GDT Entry, segment limit is 20 bits long and split into:
+    1. Lower 16 bits → LIMIT LOW (bit range: 0-15)
+    2. Upper 4 bits → LIMIT HIGH (bit range: 48-51) *This field is combine with FLAGS field and makes up an 8-bit field total*
+- **How Granularity (G bit) affects Segment Limit?
+  - If G = 0: limit is in bytes → max size = ~1 MB
+  - If G = 1: limit is in 4 KB block → max size = ~ 4 GB
+
+    Let:
+    ```
+    Limit = 0xFFFF ; 20-bit max
+    G = 1          ; Granularity = 4KB
+    ```
+
+    Then:
+    ```
+    Effective Segment Size = (Limit + 1) x 4KB
+                           = (0xFFFF + 1) x 4KB
+                           = 4 GB
+    ```
+
+### :large_blue_diamond: Base Address (32 bits)
+
+
+### :large_blue_diamond: Access Byte (8 bits)
+
+#### :small_orange_diamond: Descriptor Privilege Level (DPL)
 - DPL is a 2-bit field inside a GDT entry which defines who is allowed to access a particular segment.
 - DPL is part of the Access Byte, which is 5th byte (byte 5) in GDT entry (see GDT Entry Layout)
 
@@ -70,10 +109,4 @@ A collection of ASM and C snippet while I study on operating system
   - The CPU compares CPL, DPL, and RPL to decide if access is allowed:
     - If not → General Protection Fault.
 
-### Type of Descriptors
-1. Code Segment Descriptor
-    - Defines a segment containing executable code
-2. Data Segment Descriptor
-    - Defines a segment containing data
-3. System Segment Descriptor
-    - Defines system segments used by the OS
+### :large_blue_diamond: FLAGS (4 bits) or Limit High + FLAGS (8 bits)
