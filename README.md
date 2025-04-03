@@ -155,3 +155,9 @@ A collection of notes and experiment codes I do when studied about Operating Sys
 
 ---
 ### :large_blue_diamond: FLAGS (4 bits) or Limit High + FLAGS (8 bits)
+
+---
+### :large_blue_diamond: Enable A20 Line
+
+---
+### :large_blue_diamond: Cross Compiler
