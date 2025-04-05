@@ -84,6 +84,12 @@ load32:
     mov ebp, 0x00200000
     mov esp, ebp
 
+.print_char:
+    mov esi, 0xB8000    ; VGA text mode
+    mov byte[esi], 'H'
+    mov byte[esi+1], 0x2F ; color code fg: white, bg: green
+
+
     ; infinity loop
     jmp $
 
