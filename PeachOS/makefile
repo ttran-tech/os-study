@@ -1,11 +1,11 @@
-all : boot.asm
-	nasm -f bin -o boot.bin boot.asm
+all : 
+	nasm -f bin ./src/boot/boot.asm -o ./bin/boot.bin
 
 clean:
-	rm -f boot.bin boot.o boot.elf
+	rm -rf ./bin/boot.bin
 
 run:
-	qemu-system-x86_64 -hda boot.bin
+	qemu-system-x86_64 -hda ./bin/boot.bin
 
 run-remote:
 	qemu-system-x86_64 -s -S -hda boot.bin
