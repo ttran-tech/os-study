@@ -2,6 +2,9 @@
 
 This file contains step by step guideline.
 
+## Progresss Diagram
+![progress.png](./assets/progress.png)
+
 ## 1. Initialize Bootloader and Reset Segment Registers
 
 *boot.asm*
