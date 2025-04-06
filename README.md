@@ -2,6 +2,7 @@
 A collection of notes and experiment codes I do while studying Operating System.
 
 *The notes were taking based on personal research and understanding; therefore, they may contain misconceived or inacurrate information.*
+
 ---
 ## Table of Contents
 - [OS Dev. Notes](./guides/OS-DEV-NOTES.md)
