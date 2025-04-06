@@ -1,4 +1,4 @@
 # Peach OS
 
 ## Process
-![progress.png](./docs/progress.png)
+![progress.png](../guides/assets/progress.png)
