@@ -160,7 +160,7 @@ dw 0xAA55
     - `register info` or `reg info` to show all register.
 
 ---
-## Enable A20 Line
+## 3. Enable A20 Line
 
 ```
 ; Source: https://wiki.osdev.org/A20_Line#Fast_A20_Gate
@@ -193,7 +193,7 @@ A20_on:
 ```
 
 ---
-## Install Cross Compiler
+## 4. Install Cross Compiler
 
 Downloads:
 
