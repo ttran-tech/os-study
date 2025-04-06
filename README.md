@@ -7,6 +7,7 @@ A collection of notes and experiment codes I do while studying Operating System.
 - [Bitwise Operations & Common Pattern](./guides/BITWISE.md)
 - [Makefile Notes](./guides/Makefile)
 - [ASCII Code](./guides/ASCIICODE.md)
+- [Linker Script](./guides/LINKER-SCRIPT.md)
 
 ## Disclaimer
 *The notes were taking based on personal research and understanding; therefore, they may contain misconceived or inacurrate information.*
