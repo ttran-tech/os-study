@@ -10,7 +10,7 @@ A collection of notes and experiment codes I do while studying Operating System.
   - [ASCII Code](./guides/ASCIICODE.md)
   - [Linker Script](./guides/LINKER-SCRIPT.md)
 - Projects
-  - [Peach OS](./PeachOS): My walkthrough project from an [OS Dev course](https://www.udemy.com/course/developing-a-multithreaded-kernel-from-scratch/) 
+  - [Peach OS](./PeachOS) - My walkthrough project from an [OS Dev course](https://www.udemy.com/course/developing-a-multithreaded-kernel-from-scratch/) 
 
 ## Disclaimer
 *The notes were taking based on personal research and understanding; therefore, they may contain misconceived or inacurrate information.*
