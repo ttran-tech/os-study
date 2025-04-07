@@ -38,7 +38,8 @@ load_protected:
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
-    jmp CODE_SEG:load32
+    ; jmp CODE_SEG:load32
+    jmp $
 
 ; Setting up Global Descriptor Table (GDT)
 gdt_start:
@@ -72,65 +73,117 @@ gtd_descriptor:
     dw gdt_end - gdt_start - 1 ; Size of GDT (Limit)
     dd gdt_start    ; Linear address of GDT (Base)
 
-[BITS 32]
+[BIT 32]
 load32:
-    mov ax, DATA_SEG
-    ; load all data segment register with DATA_SEG selector
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
-    ; Setting up the stack
-    mov ebp, 0x00200000
-    mov esp, ebp
-
+; Starts Protected Mode
 start_protected_mode:
 	jmp is_A20_on? ; test for A20 line when starting Protected Mode
 
-enable_A20:	; enable A20 if A20 line is cleared
+; Enables A20 line
+enable_A20:
 	in al, 0x92
 	or al, 2
 	out 0x92, al
 	jmp is_A20_on? ; re-test A20 line
 
+; Test if A20 line is enabled
 is_A20_on?:
 	pushad
-	mov edi,0x112345  ;odd megabyte address.
-	mov esi,0x012345  ;even megabyte address.
-	mov [esi],esi     ;making sure that both addresses contain diffrent values.
-	mov [edi],edi     ;(if A20 line is cleared the two pointers would point to the address 0x012345 that would contain 0x112345 (edi)) 
-	cmpsd             ;compare addresses to see if the're equivalent.
+	mov edi,0x112345  ; odd megabyte address.
+	mov esi,0x012345  ; even megabyte address.
+	mov [esi],esi     ; making sure that both addresses contain diffrent values.
+	mov [edi],edi     ; (if A20 line is cleared the two pointers would point to the address 0x012345 that would contain 0x112345 (edi)) 
+	cmpsd             ; compare addresses to see if the're equivalent.
 	popad
-	jne A20_on        ;if not equivalent , A20 line is set.
-	jmp enable_A20    ;if equivalent, the A20 line is cleared, jmp to enable_A20.
+	jne A20_on        ; if not equivalent , A20 line is set.
+	jmp enable_A20    ; if equivalent, the A20 line is cleared, jmp to enable_A20.
 
 A20_on:
-    mov esi, msg_A20_on             ; prepare the string to call print_string function
-    mov ah, [msg_A20_on_color]    ; add color code
-    call print_string
-    hang:
-        ; infinity loop
-        jmp $
+    jmp load_kernel
 
-print_string:
-    mov edi, VGA_MEMORY
-    .print_char:
-        lodsb
-        cmp al, 0
-        je .done
-        mov [edi], al
-        mov byte [edi+1], ah
-        add edi, 2
-        jmp .print_char
-    .done:
-        ret
+; LOAD THE KERNEL
+load_kernel:
+    ; LBA number sectors:
+    ;   0: bootloader
+    ;   1: second sector
+    mov eax, 1          ; load LBA number sector into EAX (second sector - kernel code)
+    mov ecx, 100        ; total sectors to read, bytes = 512 * 100 = 51,200 bytes loaded
+    mov edi, 0x0100000  ; the address in memory to load the sectors into
+    call ata_lba_read
+    ; Once the sectors loaded, jump to where the kernel was loaded
+    ; and execute the kernel.asm file.
+    ; CODE_SEG ensures the CS register becomes the code selector specified in the GDT
+    ; enforcing the GDT code rules for execution.
+    jmp CODE_SEG:0x0100000
 
+ata_lba_read:
+    mov ebx, eax    ; backup the LBA
+    ; Send the hightest 8 bits of the LBA to hard disk controller
+    shr eax, 24     ; EAX = 0000 0000 0000 0000
+    ; Bit: 7 6 5 4 3 2 1 0
+    ;      1 1 1 0 0 0 0 0
+    ;      - - - - -------   
+    ;      │ │ │ │   │
+    ;      │ │ │ │   │ 
+    ;      │ │ │ │   │
+    ;      │ │ │ │   └─ LBA bits 24–27 (upper 4 bits of 28-bit address)
+    ;      │ │ │ │
+    ;      │ │ │ └─ Reserved (usually 0)
+    ;      │ │ └─ Always 1 (bit 5), safe default 
+    ;      │ └─ Drive select: 1 = master, 0 = slave
+    ;      └─ LBA mode: 1 = enable LBA (not CHS)
+    ;
+    or eax, 0xE0    ; set control bits (select Master drive) | EAX = 0000 0000 0000 0000 1110 0000
+    mov dx, 0x1F6   ; sets dx to port 0x1F6 (Drive/Head register)
+    out dx, al      ; sends request (control bytes) to Drive/Head register (port 0x1F6)
 
-msg_A20_on: db "A20 is on ", 0
-msg_A20_on_color: db 0x2F
-msg_A20_off: db "A20 is off ", 0
-msg_A20_off_color: db 0xCF
+    ; Send the total sectors to read to port 0x1F2
+    mov eax, ecx
+    mov dx, 0x1F2   ; load port number
+    out dx, al      ; send request to port
+
+    ; *** SEND LBA BYTE TO DISK CONTROL BOARD ***
+    ; Send LBA Low Byte (bit 0-7) to port 0x1F3
+    mov eax, ebx    ; restore the backup LBA
+    mov dx, 0x1F3   ; load port number
+    out dx, al      ; send request to port
+
+    ; Send LBA Mid Byte (bit 8-15) to port 0x1F4
+    mov eax, ebx    ; restore the back LBA
+    shr eax, 8
+    mov dx, 0x1F4   ; load port number
+    out dx, al      ; send request to port
+
+    ; Send LBA High Byte (bit 16-23) to port 0x1F5
+    mov eax, ebx
+    shr eax, 16
+    mov dx, 0x1F5   ; load port number
+    out dx, al      ; send request to port
+    ; *** FINISH SEND LBA BYTE ***
+
+    ; Send READ command to port 0x1F7
+    mov al, 0x20
+    mov dx, 0x1F7   ; load port number
+    out dx, al      ; send request to port
+
+    ; Read all sectors into memory
+.next_sector:
+    push ecx
+
+    ; Check for READ status from disk
+.try_again:
+    mov dx, 0x1F7
+    in al, dx
+    test al, 8
+    jz .try_again
+
+    ; Read 256 words (512 bytes) at a time
+    mov ecx, 256
+    mov edx, 0x1F0
+    rep insw
+    pop ecx
+    loop .next_sector
+    ret
 
 ; Filling the remain bytes to 0
 times 510 - ($-$$) db 0
