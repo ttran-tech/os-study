@@ -195,3 +195,177 @@ A20_on:
 ```
 ---
 ### :large_blue_diamond: Cross Compiler
+- A **Cross Compiler** is configured to generate code for a barebones system without linking to any standard libraries like *glibc* or make any system calls that the kernel doesn't yet support.
+
+Downloads:
+
+binutils-2.35: https://ftp.gnu.org/gnu/binutils/
+
+gcc-10.2.0: https://ftp.lip6.fr/pub/gcc/releases/gcc-10.2.0/
+
+```
+sudo apt install build-essential
+sudo apt install bison
+sudo apt install flex
+sudo apt install libgmp3-dev
+sudo apt install libmpc-dev
+sudo apt install libmpfr-dev
+sudo apt-get install libmpc-dev
+sudo apt install texinfo
+sudo apt install libcloog-isl-dev
+sudo apt install libisl-dev 
+
+###### Install binutils #######################################################
+export PREFIX="$HOME/opt/cross"
+export TARGET=i686-elf
+export PATH="$PREFIX/bin:$PATH"
+
+cd $HOME/src
+
+mkdir build-binutils
+cd build-binutils
+../binutils-2.35/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
+make
+make install
+
+###### Install GCC #######################################################
+
+export PREFIX="$HOME/opt/cross"
+export TARGET=i686-elf
+export PATH="$PREFIX/bin:$PATH"
+
+cd $HOME/src
+
+# The $PREFIX/bin dir _must_ be in the PATH. We did that above.
+which -- $TARGET-as || echo $TARGET-as is not in the PATH
+
+mkdir build-gcc
+cd build-gcc
+../gcc-10.2.0/configure --target=$TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ --without-headers --disable-hosted-libstdcxx
+make all-gcc
+make all-target-libgcc
+make all-target-libstdc++-v3
+make install-gcc
+make install-target-libgcc
+make install-target-libstdc++-v3
+```
+
+### :large_blue_diamond: A Simple Disk Driver
+- The purpose of this driver is to provide a way for the bootloader to load kernel code into memory; hence, transferring the control to the kernel.
+
+#### Build Script (build.sh)
+- This script sets up the PATH to the cross compiler. 
+- Allows the Makefile to locate and execute GCC Cross Compiler instead of the system compiler.
+
+```
+#/bin/bash
+export PREFIX="$HOME/opt/cross"
+export TARGET=i686-elf
+export PATH="$PREFIX/bin:$PATH"
+make all
+```
+
+#### Makefile Config
+```
+# Defines a variables FILES containing the objects files to be linked
+# together to form the kernel binary.
+FILES = ./build/kernel.asm.o
+
+###############################################################################
+# Syntax
+# Target: Dependency_1 Dependency_2
+#	Command_1
+#	Command_2
+###############################################################################
+
+# Build all target
+all: ./bin/boot.bin ./bin/kernel.bin
+# Remove old os.bin, -rf recursive and force to remove all files and directories
+	rm -rf ./bin/os.bin
+# Concatenate *.bin files into a single os.bin in sector order:
+# 	Sector 0: boot.bin
+# 	Sector 1: kernel.bin
+# if: input file
+	dd if=./bin/boot.bin >> ./bin/os.bin
+	dd if=./bin/kernel.bin >> ./bin/os.bin
+# Padding the rest of the file with zeros in multiple of 512 (block size * # of empty sectors).
+# bs = block size.
+# count = # of empty sectors.
+	dd if=/dev/zero bs=512 count=100 >> ./bin/os.bin
+
+# Build the kernel sector binary.
+./bin/kernel.bin: $(FILES)
+# i686-elf-ld: link the object files (*.o) into a single object file.
+# -g: enable debugging information.
+# -relocatable: tells the linnker to create a relocatable output.
+#				the object files can be used as input to the linker again.
+# kernelfull.o: contains all the code that will be in the final kernel binary
+	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
+# i686-elf-gcc: link the object files into a binary using the linker script (-T <path to linker script>).
+# -ffreestanding: freestanding code (not hosted by an OS).
+# -O0: no optimize.
+# -nostdlib: no link to standard libraries.
+	i686-elf-gcc -T ./scr/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
+
+# Build the boot sector binary
+./bin/boot.bin: ./src/boot/boot.asm
+	nasm -f bin ./src/boot/boot.asm -o ./bin/boot.bin
+
+# Assemble the kernel.asm into an object file
+./build/kernel.asm.o: ./src/kernel.asm
+# -f elf: tells NASM to ouput in the ELF format (Executable and Linkable Format)
+	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.o
+
+# clean up build
+clean:
+	rm -rf ./bin/boot.bin
+
+# run
+run:
+	qemu-system-x86_64 -hda ./bin/boot.bin
+
+# run qemu with remote dbg
+run-remote:
+	qemu-system-x86_64 -s -S -hda boot.bin
+```
+
+
+#### Linker Script
+```
+/* 
+ * Linker Script for Kernel Debugging
+ * ----------------------------------
+ * This script defines how the linker should arrange the kernel binary in memory.
+ * It ensures proper memory layout and symbol resolution, enabling us to debug 
+ * the kernel with tools like GDB using named symbols (e.g., "break kernel_start")
+ * instead of raw memory addresses.
+ */
+ENTRY(_start) /* Signifies the starting point of the execution in the kernel */
+OUTPUT_FORMAT(binary) /* Sets the output format */
+SECTIONS /* Defines memory layout of the output */
+{
+    . = 1M; /* Sets the start of the section at 1MB mark (match the kernel load address) */
+    .text : /* Program code */
+    {   /* Tells the linker to take all .text sections from the input files and put them into the .text section of the output file */
+        *(.text) 
+    }
+
+    .rodata : /* Read-only data */
+    {
+        *(.rodata)
+    }
+
+    .data : /* Initialized data */
+    {
+        *(.data)
+    }
+
+    .bss : /* Unintialized data */
+    {
+        *(COMMON)
+        *(.bss)
+    }
+}
+```
+
+#### Disk Driver Source Code
