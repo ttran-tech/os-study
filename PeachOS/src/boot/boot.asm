@@ -120,18 +120,23 @@ ata_lba_read:
     mov ebx, eax    ; backup the LBA
     ; Send the hightest 8 bits of the LBA to hard disk controller
     shr eax, 24     ; EAX = 0000 0000 0000 0000
-    ; Bit: 7 6 5 4 3 2 1 0
-    ;      1 1 1 0 0 0 0 0
-    ;      - - - - -------   
-    ;      │ │ │ │   │
-    ;      │ │ │ │   │ 
-    ;      │ │ │ │   │
-    ;      │ │ │ │   └─ LBA bits 24–27 (upper 4 bits of 28-bit address)
-    ;      │ │ │ │
-    ;      │ │ │ └─ Reserved (usually 0)
-    ;      │ │ └─ Always 1 (bit 5), safe default 
-    ;      │ └─ Drive select: 1 = master, 0 = slave
-    ;      └─ LBA mode: 1 = enable LBA (not CHS)
+    ;
+    ; Control Bit (0xE0/0xF0)
+    ; 0xE0 (1110 0000): Master drive
+    ; 0xF0 (1111 0000): Slave drive
+    ;
+    ; Bit:  7 6 5 4 3 2 1 0
+    ;       1 1 1 0 0 0 0 0
+    ;       V v V V \_____/   
+    ;       │ │ │ │   │
+    ;       │ │ │ │   │ 
+    ;       │ │ │ │   │
+    ;       │ │ │ │   └─ bits 24-27 of the block number (LBA addressing) (bit 0-3)
+    ;       │ │ │ │
+    ;       │ │ │ └─ Drive select: 1 = master, 0 = slave (bit 4)
+    ;       │ │ └─ Always set 1 (bit 5)
+    ;       │ └─ LBA mode: 0 = CHS Addressing, 1 = LBA Addressing (bit 6)
+    ;       └─ Always set 1 (bit 7)
     ;
     or eax, 0xE0    ; set control bits (select Master drive) | EAX = 0000 0000 0000 0000 1110 0000
     mov dx, 0x1F6   ; sets dx to port 0x1F6 (Drive/Head register)
