@@ -6,15 +6,17 @@ DATA_SEG equ 0x10
 VGA_MEMORY equ 0xB8000
 
 _start:
-    mov ax, DATA_SEG
+    mov ax, DATA_SEG ; Setting up segment registers to poin to DATA_SEG
     ; load all data segment register with DATA_SEG selector
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    ; Setting up the stack
-    mov ebp, 0x00200000
+
+    ; Setting up the stack pointer to 0x200000,
+    ; any stack operations will start at 0x200000
+    mov ebp, 0x00200000 
     mov esp, ebp
     
     ; mov esi, msg
