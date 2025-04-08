@@ -36,7 +36,7 @@ all: ./bin/boot.bin ./bin/kernel.bin
 # -ffreestanding: freestanding code (not hosted by an OS).
 # -O0: no optimize.
 # -nostdlib: no link to standard libraries.
-	i686-elf-gcc -T ./scr/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
+	i686-elf-gcc -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
 
 # Build the boot sector binary
 ./bin/boot.bin: ./src/boot/boot.asm
@@ -53,8 +53,11 @@ clean:
 
 # run
 run:
-	qemu-system-x86_64 -hda ./bin/boot.bin
+	qemu-system-x86_64 -hda ./bin/os.bin
 
 # run qemu with remote dbg
-run-remote:
-	qemu-system-x86_64 -s -S -hda boot.bin
+dbg:
+	qemu-system-x86_64 -s -S -hda ./bin/os.bin
+
+# gdb internal debug
+# target remote | qemu-system-x86_64 -S -gdb stdio -hda ./bin/os.bin
