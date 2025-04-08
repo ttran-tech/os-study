@@ -28,7 +28,6 @@ registers_reset_step2:
 ; =================== PROTECTED MODE SETTING ========================================
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
-VGA_MEMORY equ 0xB8000
 
 load_protected:
     cli ; disable interrupt
@@ -73,33 +72,33 @@ gtd_descriptor:
     dw gdt_end - gdt_start - 1 ; Size of GDT (Limit)
     dd gdt_start    ; Linear address of GDT (Base)
 
-[BIT 32]
+[BITS 32]
 load32:
 ; Starts Protected Mode
-start_protected_mode:
-	jmp is_A20_on? ; test for A20 line when starting Protected Mode
+; start_protected_mode:
+; 	jmp is_A20_on? ; test for A20 line when starting Protected Mode
 
-; Enables A20 line
+; ; Enables A20 line
 enable_A20:
 	in al, 0x92
 	or al, 2
 	out 0x92, al
-	jmp is_A20_on? ; re-test A20 line
+; 	jmp is_A20_on? ; re-test A20 line
 
-; Test if A20 line is enabled
-is_A20_on?:
-	pushad
-	mov edi,0x112345  ; odd megabyte address.
-	mov esi,0x012345  ; even megabyte address.
-	mov [esi],esi     ; making sure that both addresses contain diffrent values.
-	mov [edi],edi     ; (if A20 line is cleared the two pointers would point to the address 0x012345 that would contain 0x112345 (edi)) 
-	cmpsd             ; compare addresses to see if the're equivalent.
-	popad
-	jne A20_on        ; if not equivalent , A20 line is set.
-	jmp enable_A20    ; if equivalent, the A20 line is cleared, jmp to enable_A20.
+; ; Test if A20 line is enabled
+; is_A20_on?:
+; 	pushad
+; 	mov edi,0x112345  ; odd megabyte address.
+; 	mov esi,0x012345  ; even megabyte address.
+; 	mov [esi],esi     ; making sure that both addresses contain diffrent values.
+; 	mov [edi],edi     ; (if A20 line is cleared the two pointers would point to the address 0x012345 that would contain 0x112345 (edi)) 
+; 	cmpsd             ; compare addresses to see if the're equivalent.
+; 	popad
+; 	jne A20_on        ; if not equivalent , A20 line is set.
+; 	jmp enable_A20    ; if equivalent, the A20 line is cleared, jmp to enable_A20.
 
-A20_on:
-    jmp load_kernel
+; A20_on:
+;     jmp load_kernel
 
 ; LOAD THE KERNEL
 load_kernel:
