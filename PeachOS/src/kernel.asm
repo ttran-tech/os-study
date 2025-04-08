@@ -3,6 +3,7 @@ global _start
 
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
+VGA_MEMORY equ 0xB8000
 
 _start:
     mov ax, DATA_SEG
@@ -16,9 +17,9 @@ _start:
     mov ebp, 0x00200000
     mov esp, ebp
     
-    mov esi, msg
-    mov ah, [msg_color]
-    call print_string
+    ; mov esi, msg
+    ; mov ah, [msg_color]
+    ; call print_string
 
     jmp $
 
