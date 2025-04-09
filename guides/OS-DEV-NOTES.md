@@ -1,6 +1,12 @@
 # OS Dev Notes
 ## Table of Contents
 - [Bit & Bytes](#bits-&-bytes)
+- [x86 Type & Size](#x86-types-&-size)
+- [Global Descriptor Table (GDT)](#global-descriptor-table-(gdt))
+- [Enable A20 Line](#enable-a20-line)
+- [Cross Compiler](#cross-compiler)
+- [A Simple Disk Driver](#A-Simple-Disk-Driver)
+- [Addressing Misalignment Issue](#addressing-misalignment-issue)
 
 ## Bits & Bytes
 ![image](https://github.com/user-attachments/assets/969dd630-4c19-46bd-b924-47b337200e25)
@@ -157,7 +163,7 @@
 ### :large_blue_diamond: FLAGS (4 bits) or Limit High + FLAGS (8 bits)
 
 ---
-### :large_blue_diamond: Enable A20 Line
+## Enable A20 Line
 
 - The **A20 Line** is the 21st address line on x86 CPUs which allows access to memory above 1 MB (0xFFFFF).
 
@@ -198,7 +204,7 @@ A20_on:
 	; do others task here
 ```
 ---
-### :large_blue_diamond: Cross Compiler
+## Cross Compiler
 - A **Cross Compiler** is configured to generate code for a barebones system without linking to any standard libraries like *glibc* or make any system calls that the kernel doesn't yet support.
 
 Downloads:
@@ -254,7 +260,7 @@ make install-target-libgcc
 make install-target-libstdc++-v3
 ```
 
-### :large_blue_diamond: A Simple Disk Driver
+## A Simple Disk Driver
 - The purpose of this driver is to provide a way for the bootloader to load kernel code into memory; hence, transferring the control to the kernel.
 
 #### Build Script (build.sh)
