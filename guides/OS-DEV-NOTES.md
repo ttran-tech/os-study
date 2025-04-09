@@ -1,3 +1,7 @@
+# OS Dev Notes
+## Table of Contents
+- [Bit & Bytes](#bits-&-bytes)
+
 ## Bits & Bytes
 ![image](https://github.com/user-attachments/assets/969dd630-4c19-46bd-b924-47b337200e25)
 
