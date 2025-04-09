@@ -514,7 +514,7 @@ ata_lba_read:
     - Compatible with paging and virtual memory.
     - Clean memory layout.
 
-#### B. Dis Sector Alignment via Assembly Padding
+#### B. DisK Sector Alignment via Assembly Padding
 - Add padding at the end of a binary section:
 ```
 times 512 - ($ - $$) db 0
