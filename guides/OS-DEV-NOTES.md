@@ -469,3 +469,69 @@ ata_lba_read:
     loop .next_sector
     ret
 ```
+## Addressing Misalignment Issue
+### :large_blue_diamond: Overview
+- **Alignment refers to place data or code at memory address that are multiples of a specific boundary size, such as 16 bytes, 512 bytes, or 4096 bytes (4 KiB).
+
+### :large_blue_diamond: Why Alignment Matters
+1. Memory/Page Alignment (4096 bytes)
+	- x86 architechture uses 4 KiB boundaries can:
+ 		- Break paging setup (e.g., page table misbehavior).
+   		- Lead to page faults, incorrect memory access, or inefficient memory usage.
+		- Prevent clean separation of `.text`, `.data`, `.bss` sections.
+	- Real Impact:
+        - Kernel crashes during boot.
+        - Page table misconfiguration or access violation.
+        - Performance issue from unaligned memory.
+
+2. Disk Sector Alignment (512 bytes) 
+    - BIO and ATA read data in 512-bytes sectors.
+    - If bootloader or kernel binary is not padded to 512 bytes:
+        - BIOS may read garbage data.
+        - Kernel may load improperly.
+        - Could corrupt control flow or crash during boot.
+    - Real Impact:
+        - Boot failure.
+        - Incorrect data loaded into memory.
+        - Kernel loaded with wrong offset or missing instructions.
+     
+### :large_blue_diamond: Solutions
+#### A. Memory Alignment via Linker Script
+-  Add `ALIGN(4096)` to each section:
+```
+.text ALIGN(4096) :
+{
+    *(.text)
+}
+
+.data ALIGN(4096) :
+{
+    *(.data)
+}
+```
+- This helps to ensure:
+    - Sections start at a page boundary.
+    - Compatible with paging and virtual memory.
+    - Clean memory layout.
+
+#### B. Dis Sector Alignment via Assembly Padding
+- Add padding at the end of a binary section:
+```
+times 512 - ($ - $$) db 0
+
+$ = current location
+$$ = start of section
+db 0 = Padding the sector with exactly 512 bytes
+```
+- This helps to ensure:
+    - BIO reads a complete sector (512 bytes).
+    - Bootloader/Kernel is not partially loaded or misaligned.
+ 
+### :large_blue_diamond: Visualize
+
+```C
+[Disk Layout]
+
+| Bootloader (512 bytes) |
+
+```
