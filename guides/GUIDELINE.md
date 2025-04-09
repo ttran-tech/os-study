@@ -198,25 +198,31 @@ A20_on:
 ---
 ## 4. Install Cross Compiler
 
-Downloads:
+### 4.1 CCross Compiler Successful Builds 
+- Check for working combined version of binutils and gcc
+    - [Cross Compiler Successful Builds](https://wiki.osdev.org/Cross-Compiler_Successful_Builds)
 
-binutils-2.35: https://ftp.gnu.org/gnu/binutils/
+### 4.2 Downloads
+- binutils-2.35: https://ftp.gnu.org/gnu/binutils/
 
-gcc-10.2.0: https://ftp.lip6.fr/pub/gcc/releases/gcc-10.2.0/
+- gcc-10.2.0: https://ftp.lip6.fr/pub/gcc/releases/gcc-10.2.0/
 
+### 4.3 Install Dependencies
 ```
-sudo apt install build-essential
-sudo apt install bison
-sudo apt install flex
-sudo apt install libgmp3-dev
-sudo apt install libmpc-dev
-sudo apt install libmpfr-dev
-sudo apt-get install libmpc-dev
-sudo apt install texinfo
-sudo apt install libcloog-isl-dev
-sudo apt install libisl-dev 
+sudo apt install build-essential -y
+sudo apt install bison -y
+sudo apt install flex -y
+sudo apt install libgmp3-dev -y
+sudo apt install libmpc-dev -y
+sudo apt install libmpfr-dev -y
+sudo apt-get install libmpc-dev -y
+sudo apt install texinfo -y
+sudo apt install libcloog-isl-dev -y
+sudo apt install libisl-dev -y
+```
 
-###### Install binutils #######################################################
+### 4.4 Install `binutils`
+```
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
@@ -228,16 +234,17 @@ cd build-binutils
 ../binutils-2.35/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
 make
 make install
+```
 
-###### Install GCC #######################################################
-
+### 4.5 Install `gcc`
+```
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 
 cd $HOME/src
 
-# The $PREFIX/bin dir _must_ be in the PATH. We did that above.
+# The $PREFIX/bin dir _must_ be in the PATH. We did that above. MUST install binutils first.
 which -- $TARGET-as || echo $TARGET-as is not in the PATH
 
 mkdir build-gcc
@@ -249,4 +256,17 @@ make all-target-libstdc++-v3
 make install-gcc
 make install-target-libgcc
 make install-target-libstdc++-v3
+```
+
+### 4.6 Test New Compiler
+```
+$HOME/opt/cross/bin/$TARGET-gcc --version
+```
+
+**Output**
+```
+i686-elf-gcc (GCC) 10.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
