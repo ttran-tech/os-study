@@ -37,8 +37,7 @@ load_protected:
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
-    ; jmp CODE_SEG:load32
-    jmp $
+    jmp CODE_SEG:load32
 
 ; Setting up Global Descriptor Table (GDT)
 gdt_start:
@@ -75,30 +74,30 @@ gtd_descriptor:
 [BITS 32]
 load32:
 ; Starts Protected Mode
-; start_protected_mode:
-; 	jmp is_A20_on? ; test for A20 line when starting Protected Mode
+start_protected_mode:
+	jmp is_A20_on? ; test for A20 line when starting Protected Mode
 
 ; ; Enables A20 line
 enable_A20:
 	in al, 0x92
 	or al, 2
 	out 0x92, al
-; 	jmp is_A20_on? ; re-test A20 line
+	jmp is_A20_on? ; re-test A20 line
 
 ; ; Test if A20 line is enabled
-; is_A20_on?:
-; 	pushad
-; 	mov edi,0x112345  ; odd megabyte address.
-; 	mov esi,0x012345  ; even megabyte address.
-; 	mov [esi],esi     ; making sure that both addresses contain diffrent values.
-; 	mov [edi],edi     ; (if A20 line is cleared the two pointers would point to the address 0x012345 that would contain 0x112345 (edi)) 
-; 	cmpsd             ; compare addresses to see if the're equivalent.
-; 	popad
-; 	jne A20_on        ; if not equivalent , A20 line is set.
-; 	jmp enable_A20    ; if equivalent, the A20 line is cleared, jmp to enable_A20.
+is_A20_on?:
+	pushad
+	mov edi,0x112345  ; odd megabyte address.
+	mov esi,0x012345  ; even megabyte address.
+	mov [esi],esi     ; making sure that both addresses contain diffrent values.
+	mov [edi],edi     ; (if A20 line is cleared the two pointers would point to the address 0x012345 that would contain 0x112345 (edi)) 
+	cmpsd             ; compare addresses to see if the're equivalent.
+	popad
+	jne A20_on        ; if not equivalent , A20 line is set.
+	jmp enable_A20    ; if equivalent, the A20 line is cleared, jmp to enable_A20.
 
-; A20_on:
-;     jmp load_kernel
+A20_on:
+    jmp load_kernel
 
 ; LOAD THE KERNEL
 load_kernel:
