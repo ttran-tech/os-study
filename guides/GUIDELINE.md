@@ -7,17 +7,17 @@
 ![progress.png](./assets/progress.png)
 
 ## 0. Starting Setup
-#### 0.1 Install gcc
+### 0.1 Install gcc
 ```
 sudo apt install build-essential
 ```
 
-#### 0.2 Install QEMU
+### 0.2 Install QEMU
 ```
 sudo apt install qemu-system-i386
 ```
 
-#### 0.3 Install gdb
+### 0.3 Install gdb
 ```
 sudo apt install gdb
 ```
@@ -446,10 +446,10 @@ SECTIONS /* Defines memory layout of the output */
 load_kernel:
     ; LBA number sectors:
     ;   0: bootloader
-    ;   1: second sector
+    ;   1: second sector (kernel code - this is defined in Makefile dd command)
     mov eax, 1          ; load LBA number sector into EAX (second sector - kernel code)
     mov ecx, 100        ; total sectors to read, bytes = 512 * 100 = 51,200 bytes loaded
-    mov edi, 0x0100000  ; the address in memory to load the sectors into
+    mov edi, 0x0100000  ; the address in memory to load the second sectors 
     call ata_lba_read
     ; Once the sectors loaded, jump to where the kernel was loaded
     ; and execute the kernel.asm file.
@@ -531,3 +531,37 @@ ata_lba_read:
     loop .next_sector
     ret
 ```
+
+### 5.5 Compile project
+```bash
+make clean
+./build.sh
+```
+
+### 5.6 Test in `gdb`
+#### 5.6.1 Start GDB and Set to Intel syntax
+```gdb
+gdb
+set disassembly-flavor intel
+```
+
+#### 5.6.2 Add debug symbol (cwd at `PeachOs/`)
+```gdb
+add-symbol-file ./build/kernelfull.o 0x100000
+```
+
+#### 5.6.3 Set Breakpoint at _start (Addr: 0x100000)
+```gdb
+break _start
+```
+
+#### 5.6.4 Start `qemu` in `gdb` using `target remote`
+```gdb
+target remote | qemu-system-x86_64 -S -gdb stdio -hda ./bin/os.bin
+```
+
+#### 5.6.5 Expected result
+- `qemu` starts and freeze at the booting screen
+- Press `c` to continue (in `gdb`)
+- `qemu` continues to start bootloader (`boot.asm`) → `boot.asm` loads `kernel.asm` into memory and jump to _start at 0x100000.
+- `gdb` should stop at `_start` (0x100000) which is the starting address in memory where `kernel.asm` expected to load.
