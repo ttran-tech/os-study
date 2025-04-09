@@ -471,7 +471,7 @@ ata_lba_read:
 ```
 ## Addressing Misalignment Issue
 ### :large_blue_diamond: Overview
-- **Alignment refers to place data or code at memory address that are multiples of a specific boundary size, such as 16 bytes, 512 bytes, or 4096 bytes (4 KiB).
+- **Alignment** refers to place data or code at memory address that are multiples of a specific boundary size, such as 16 bytes, 512 bytes, or 4096 bytes (4 KiB).
 
 ### :large_blue_diamond: Why Alignment Matters
 1. Memory/Page Alignment (4096 bytes)
