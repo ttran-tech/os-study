@@ -19,9 +19,14 @@ _start:
     mov ebp, 0x00200000 
     mov esp, ebp
     
-    ; mov esi, msg
-    ; mov ah, [msg_color]
-    ; call print_string
+    ; Enable the A20 line
+    in al, 0x92
+    or al, 2
+    out 0x92, al
+
+    mov esi, msg
+    mov ah, [msg_color]
+    call print_string
 
     jmp $
 
