@@ -529,9 +529,4 @@ db 0 = Padding the sector with exactly 512 bytes
  
 ### :large_blue_diamond: Visualize
 
-```C
-[Disk Layout]
-
-| Bootloader (512 bytes) |
-
-```
+![memory alignment](./assets/memory-alignment.PNG)
