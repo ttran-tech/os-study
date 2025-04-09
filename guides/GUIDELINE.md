@@ -165,7 +165,7 @@ dw 0xAA55
 ---
 ## 3. Enable A20 Line
 
-```
+```Assembly
 ; Source: https://wiki.osdev.org/A20_Line#Fast_A20_Gate
 ; Modified by ttran.tech
 ; Test A20 and set if A20 does not set.
@@ -208,7 +208,7 @@ A20_on:
 - gcc-10.2.0: https://ftp.lip6.fr/pub/gcc/releases/gcc-10.2.0/
 
 ### 4.3 Install Dependencies
-```
+```Bash
 sudo apt install build-essential -y
 sudo apt install bison -y
 sudo apt install flex -y
@@ -222,7 +222,7 @@ sudo apt install libisl-dev -y
 ```
 
 ### 4.4 Install `binutils`
-```
+```Bash
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
@@ -237,7 +237,7 @@ make install
 ```
 
 ### 4.5 Install `gcc`
-```
+```Bash
 export PREFIX="$HOME/opt/cross"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
@@ -259,14 +259,225 @@ make install-target-libstdc++-v3
 ```
 
 ### 4.6 Test New Compiler
-```
+```Bash
 $HOME/opt/cross/bin/$TARGET-gcc --version
 ```
 
 **Output**
-```
+```Bash
 i686-elf-gcc (GCC) 10.2.0
 Copyright (C) 2020 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+```
+
+## 5. Load Kernel Into Memory
+- Create a simple disk driver to load the kernel into memory and pass the control to the kernel.
+
+### 5.1 Build Script (build.sh)
+- This script sets up the PATH to the cross compiler installed in step 4. 
+- Allows the Makefile to locate and execute GCC Cross Compiler instead of the system compiler.
+
+```Bash
+#/bin/bash
+export PREFIX="$HOME/opt/cross"
+export TARGET=i686-elf
+export PATH="$PREFIX/bin:$PATH"
+make all
+```
+
+### 5.2 Makefile Config
+```Makefile
+# Defines a variables FILES containing the objects files to be linked
+# together to form the kernel binary.
+FILES = ./build/kernel.asm.o
+
+###############################################################################
+# Syntax
+# Target: Dependency_1 Dependency_2
+#	Command_1
+#	Command_2
+###############################################################################
+
+# Build all target
+all: ./bin/boot.bin ./bin/kernel.bin
+# Remove old os.bin, -rf recursive and force to remove all files and directories
+	rm -rf ./bin/os.bin
+# Concatenate *.bin files into a single os.bin in sector order:
+# 	Sector 0: boot.bin
+# 	Sector 1: kernel.bin
+# if: input file
+	dd if=./bin/boot.bin >> ./bin/os.bin
+	dd if=./bin/kernel.bin >> ./bin/os.bin
+# Padding the rest of the file with zeros in multiple of 512 (block size * # of empty sectors).
+# bs = block size.
+# count = # of empty sectors.
+	dd if=/dev/zero bs=512 count=100 >> ./bin/os.bin
+
+# Build the kernel sector binary.
+./bin/kernel.bin: $(FILES)
+# i686-elf-ld: link the object files (*.o) into a single object file.
+# -g: enable debugging information.
+# -relocatable: tells the linnker to create a relocatable output.
+#				the object files can be used as input to the linker again.
+# kernelfull.o: contains all the code that will be in the final kernel binary
+	i686-elf-ld -g -relocatable $(FILES) -o ./build/kernelfull.o
+# i686-elf-gcc: link the object files into a binary using the linker script (-T <path to linker script>).
+# -ffreestanding: freestanding code (not hosted by an OS).
+# -O0: no optimize.
+# -nostdlib: no link to standard libraries.
+	i686-elf-gcc -T ./scr/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
+
+# Build the boot sector binary
+./bin/boot.bin: ./src/boot/boot.asm
+	nasm -f bin ./src/boot/boot.asm -o ./bin/boot.bin
+
+# Assemble the kernel.asm into an object file
+./build/kernel.asm.o: ./src/kernel.asm
+# -f elf: tells NASM to ouput in the ELF format (Executable and Linkable Format)
+	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.o
+
+# clean up build
+clean:
+	rm -rf ./bin/boot.bin
+
+# run
+run:
+	qemu-system-x86_64 -hda ./bin/boot.bin
+
+# run qemu with remote dbg
+run-remote:
+	qemu-system-x86_64 -s -S -hda boot.bin
+```
+
+- This script defines how the linker should arrange the kernel binary in memory.
+
+### 5.3 Linker Script
+```LinkerScript
+/* 
+ * Linker Script for Kernel Debugging
+ * ----------------------------------
+ * This script defines how the linker should arrange the kernel binary in memory.
+ * It ensures proper memory layout and symbol resolution, enabling us to debug 
+ * the kernel with tools like GDB using named symbols (e.g., "break kernel_start")
+ * instead of raw memory addresses.
+ */
+ENTRY(_start) /* Signifies the starting point of the execution in the kernel */
+OUTPUT_FORMAT(binary) /* Sets the output format */
+SECTIONS /* Defines memory layout of the output */
+{
+    . = 1M; /* Sets the start of the section at 1MB mark (match the kernel load address) */
+    .text : /* Program code */
+    {   /* Tells the linker to take all .text sections from the input files and put them into the .text section of the output file */
+        *(.text) 
+    }
+
+    .rodata : /* Read-only data */
+    {
+        *(.rodata)
+    }
+
+    .data : /* Initialized data */
+    {
+        *(.data)
+    }
+
+    .bss : /* Unintialized data */
+    {
+        *(COMMON)
+        *(.bss)
+    }
+}
+```
+
+### 5.4 Disk Driver Source Code
+
+```Assembly
+load_kernel:
+    ; LBA number sectors:
+    ;   0: bootloader
+    ;   1: second sector
+    mov eax, 1          ; load LBA number sector into EAX (second sector - kernel code)
+    mov ecx, 100        ; total sectors to read, bytes = 512 * 100 = 51,200 bytes loaded
+    mov edi, 0x0100000  ; the address in memory to load the sectors into
+    call ata_lba_read
+    ; Once the sectors loaded, jump to where the kernel was loaded
+    ; and execute the kernel.asm file.
+    ; CODE_SEG ensures the CS register becomes the code selector specified in the GDT
+    ; enforcing the GDT code rules for execution.
+    jmp CODE_SEG:0x0100000
+
+ata_lba_read:
+    mov ebx, eax    ; backup the LBA
+    ; Send the hightest 8 bits of the LBA to hard disk controller
+    shr eax, 24     ; EAX = 0000 0000 0000 0000
+    ;
+    ; Control Bit (0xE0/0xF0)
+    ; 0xE0 (1110 0000): Master drive
+    ; 0xF0 (1111 0000): Slave drive
+    ;
+    ; Bit:  7 6 5 4 3 2 1 0
+    ;       1 1 1 0 0 0 0 0
+    ;       V v V V \_____/   
+    ;       │ │ │ │   │
+    ;       │ │ │ │   │ 
+    ;       │ │ │ │   │
+    ;       │ │ │ │   └─ bits 24-27 of the block number (LBA addressing) (bit 0-3)
+    ;       │ │ │ │
+    ;       │ │ │ └─ Drive select: 1 = master, 0 = slave (bit 4)
+    ;       │ │ └─ Always set 1 (bit 5)
+    ;       │ └─ LBA mode: 0 = CHS Addressing, 1 = LBA Addressing (bit 6)
+    ;       └─ Always set 1 (bit 7)
+    ;
+    or eax, 0xE0    ; set control bits (select Master drive) | EAX = 0000 0000 0000 0000 1110 0000
+    mov dx, 0x1F6   ; sets dx to port 0x1F6 (Drive/Head register)
+    out dx, al      ; sends request (control bytes) to Drive/Head register (port 0x1F6)
+
+    ; Send the total sectors to read to port 0x1F2
+    mov eax, ecx
+    mov dx, 0x1F2   ; load port number
+    out dx, al      ; send request to port
+
+    ; *** SEND LBA BYTE TO DISK CONTROL BOARD ***
+    ; Send LBA Low Byte (bit 0-7) to port 0x1F3
+    mov eax, ebx    ; restore the backup LBA
+    mov dx, 0x1F3   ; load port number
+    out dx, al      ; send request to port
+
+    ; Send LBA Mid Byte (bit 8-15) to port 0x1F4
+    mov eax, ebx    ; restore the back LBA
+    shr eax, 8
+    mov dx, 0x1F4   ; load port number
+    out dx, al      ; send request to port
+
+    ; Send LBA High Byte (bit 16-23) to port 0x1F5
+    mov eax, ebx
+    shr eax, 16
+    mov dx, 0x1F5   ; load port number
+    out dx, al      ; send request to port
+    ; *** FINISH SEND LBA BYTE ***
+
+    ; Send READ command to port 0x1F7
+    mov al, 0x20
+    mov dx, 0x1F7   ; load port number
+    out dx, al      ; send request to port
+
+    ; Read all sectors into memory
+.next_sector:
+    push ecx
+
+    ; Check for READ status from disk
+.try_again:
+    mov dx, 0x1F7
+    in al, dx
+    test al, 8
+    jz .try_again
+
+    ; Read 256 words (512 bytes) at a time
+    mov ecx, 256
+    mov edx, 0x1F0
+    rep insw
+    pop ecx
+    loop .next_sector
+    ret
 ```
