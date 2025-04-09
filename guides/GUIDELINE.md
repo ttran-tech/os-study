@@ -1,11 +1,28 @@
 # OS Dev Guideline
 
-This file contains step by step guideline.
+- This file contains step by step guideline.
+- The source code is tested on Debian 12.10.0 AMD64
 
 ## Progresss Diagram
 ![progress.png](./assets/progress.png)
 
-## 1. Initialize Bootloader and Reset Segment Registers
+## 0. Starting Setup
+#### 0.1 Install gcc
+```
+sudo apt install build-essential
+```
+
+#### 0.2 Install QEMU
+```
+sudo apt install qemu-system-i386
+```
+
+#### 0.3 Install gdb
+```
+sudo apt install gdb
+```
+
+## 1. Create Bootloader and Reset Segment Registers
 
 *boot.asm*
 
