@@ -24,6 +24,15 @@ sudo apt install gdb
 
 ## 1. Create Bootloader and Reset Segment Registers
 
+- Project Structure
+
+```
+PeachOS
+│
+├── boot.asm
+```
+
+
 *boot.asm*
 
 ```Assembly
@@ -290,6 +299,30 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 ## 5. Load Kernel Into Memory
 - Create a simple disk driver to load the kernel into memory and pass the control to the kernel.
+
+- Project Structure
+
+```
+PeachOS/
+│
+├── bin/
+│	└── boot.bin
+│	└── kernel.bin
+│	└── os.bin
+│
+├── build/
+│	└── kernel.asm.o
+│	└── kernelfull.o
+│
+├── src/
+│	└── boot/
+│	│	└── boot.asm
+│	└── kernel.asm
+│	└── linker.ld
+│
+├── Makefile
+├── build.sh
+```
 
 ### 5.1 Build Script (build.sh)
 - This script sets up the PATH to the cross compiler installed in step 4. 
