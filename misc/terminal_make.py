@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Convert ASCII character and color code to unsigned integer in little endian form.
 # This is a prototype of a C version
 def terminal_make(char:str, color:int) -> int:
