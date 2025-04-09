@@ -369,3 +369,93 @@ SECTIONS /* Defines memory layout of the output */
 ```
 
 #### Disk Driver Source Code
+
+```Assembly
+load_kernel:
+    ; LBA number sectors:
+    ;   0: bootloader
+    ;   1: second sector
+    mov eax, 1          ; load LBA number sector into EAX (second sector - kernel code)
+    mov ecx, 100        ; total sectors to read, bytes = 512 * 100 = 51,200 bytes loaded
+    mov edi, 0x0100000  ; the address in memory to load the sectors into
+    call ata_lba_read
+    ; Once the sectors loaded, jump to where the kernel was loaded
+    ; and execute the kernel.asm file.
+    ; CODE_SEG ensures the CS register becomes the code selector specified in the GDT
+    ; enforcing the GDT code rules for execution.
+    jmp CODE_SEG:0x0100000
+
+ata_lba_read:
+    mov ebx, eax    ; backup the LBA
+    ; Send the hightest 8 bits of the LBA to hard disk controller
+    shr eax, 24     ; EAX = 0000 0000 0000 0000
+    ;
+    ; Control Bit (0xE0/0xF0)
+    ; 0xE0 (1110 0000): Master drive
+    ; 0xF0 (1111 0000): Slave drive
+    ;
+    ; Bit:  7 6 5 4 3 2 1 0
+    ;       1 1 1 0 0 0 0 0
+    ;       V v V V \_____/   
+    ;       │ │ │ │   │
+    ;       │ │ │ │   │ 
+    ;       │ │ │ │   │
+    ;       │ │ │ │   └─ bits 24-27 of the block number (LBA addressing) (bit 0-3)
+    ;       │ │ │ │
+    ;       │ │ │ └─ Drive select: 1 = master, 0 = slave (bit 4)
+    ;       │ │ └─ Always set 1 (bit 5)
+    ;       │ └─ LBA mode: 0 = CHS Addressing, 1 = LBA Addressing (bit 6)
+    ;       └─ Always set 1 (bit 7)
+    ;
+    or eax, 0xE0    ; set control bits (select Master drive) | EAX = 0000 0000 0000 0000 1110 0000
+    mov dx, 0x1F6   ; sets dx to port 0x1F6 (Drive/Head register)
+    out dx, al      ; sends request (control bytes) to Drive/Head register (port 0x1F6)
+
+    ; Send the total sectors to read to port 0x1F2
+    mov eax, ecx
+    mov dx, 0x1F2   ; load port number
+    out dx, al      ; send request to port
+
+    ; *** SEND LBA BYTE TO DISK CONTROL BOARD ***
+    ; Send LBA Low Byte (bit 0-7) to port 0x1F3
+    mov eax, ebx    ; restore the backup LBA
+    mov dx, 0x1F3   ; load port number
+    out dx, al      ; send request to port
+
+    ; Send LBA Mid Byte (bit 8-15) to port 0x1F4
+    mov eax, ebx    ; restore the back LBA
+    shr eax, 8
+    mov dx, 0x1F4   ; load port number
+    out dx, al      ; send request to port
+
+    ; Send LBA High Byte (bit 16-23) to port 0x1F5
+    mov eax, ebx
+    shr eax, 16
+    mov dx, 0x1F5   ; load port number
+    out dx, al      ; send request to port
+    ; *** FINISH SEND LBA BYTE ***
+
+    ; Send READ command to port 0x1F7
+    mov al, 0x20
+    mov dx, 0x1F7   ; load port number
+    out dx, al      ; send request to port
+
+    ; Read all sectors into memory
+.next_sector:
+    push ecx
+
+    ; Check for READ status from disk
+.try_again:
+    mov dx, 0x1F7
+    in al, dx
+    test al, 8
+    jz .try_again
+
+    ; Read 256 words (512 bytes) at a time
+    mov ecx, 256
+    mov edx, 0x1F0
+    rep insw
+    pop ecx
+    loop .next_sector
+    ret
+```
