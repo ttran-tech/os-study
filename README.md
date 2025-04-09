@@ -3,9 +3,9 @@ A collection of notes and experiment codes I do while studying Operating System.
 
 ## Table of Contents
 - Fundamental Concepts & Notes
-  - [OS Dev. Notes](./guides/OS-DEV-NOTES.md)
+  - [Notes](./guides/OS-DEV-NOTES.md)
   - [Step by Step Guideline](./guides/GUIDELINE.md)
-  - [Bitwise Operations & Common Pattern](./guides/BITWISE.md)
+  - [Bitwise Common Pattern](./guides/BITWISE.md)
   - [Makefile Notes](./guides/Makefile)
   - [ASCII Code](./guides/ASCIICODE.md)
   - [Linker Script](./guides/LINKER-SCRIPT.md)
