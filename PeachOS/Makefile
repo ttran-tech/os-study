@@ -50,7 +50,11 @@ all: ./bin/boot.bin ./bin/kernel.bin
 # clean up build
 clean:
 	rm -rf ./bin/boot.bin
-
+	rm -rf ./bin/kernel.bin
+	rm -rf ./bin/os.bin
+	rm -rf $(FILES)
+	rm -rf ./build/kernel.asm.o
+	
 # run
 run:
 	qemu-system-x86_64 -hda ./bin/os.bin
