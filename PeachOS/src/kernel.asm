@@ -46,3 +46,5 @@ print_string:
 
 msg: db "Hello World, Kernel! ", 0
 msg_color: db 0x2F
+
+times 512 - ($ - $$) db 0 ; add sector boundary, padding the rest of kernel sector with 0 to match 512 bytes each sector
