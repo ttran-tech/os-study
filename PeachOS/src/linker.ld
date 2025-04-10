@@ -11,24 +11,28 @@ OUTPUT_FORMAT(binary) /* Sets the output format */
 SECTIONS /* Defines memory layout of the output */
 {
     . = 1M; /* Sets the start of the section at 1MB mark (match the kernel load address) */
-    .text : /* Program code */
+    .text ALIGN(4096) : /* Program code - ALIGN(4096) set page boundary */
     {   /* Tells the linker to take all .text sections from the input files and put them into the .text section of the output file */
         *(.text) 
     }
 
-    .rodata : /* Read-only data */
+    .rodata ALIGN(4096) : /* Read-only data */
     {
         *(.rodata)
     }
 
-    .data : /* Initialized data */
+    .data ALIGN(4096) : /* Initialized data */
     {
         *(.data)
     }
 
-    .bss : /* Unintialized data */
+    .bss ALIGN(4096) : /* Unintialized data */
     {
         *(COMMON)
         *(.bss)
+    }
+    .asm ALIGN(4096) : /* custom section */
+    {
+        *(.asm)
     }
 }
