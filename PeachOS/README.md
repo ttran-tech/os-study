@@ -2,4 +2,4 @@
 
 ### Flowchart
 
-![progress.png](../guides/assets/flow-diagram.svg)
+![progress.png](../guides/assets/flow-diagram.png)

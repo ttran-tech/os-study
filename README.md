@@ -14,7 +14,7 @@ A collection of notes and experiment codes I do while studying Operating System.
 
 ### Flowchart
 
-![progress.png](./guides/assets/flow-diagram.svg)
+![progress.png](./guides/assets/flow-diagram.png)
 
 ## Disclaimer
 *The notes were taking based on personal research and understanding; therefore, they may contain misconceived or inacurrate information.*

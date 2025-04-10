@@ -5,7 +5,7 @@
 
 ## Flowchart
 
-![progress.png](../guides/assets/flow-diagram.svg)
+![progress.png](../guides/assets/flow-diagram.png)
 
 ## 0. Starting Setup
 ### 0.1 Install gcc
