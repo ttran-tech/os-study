@@ -181,11 +181,13 @@ ata_lba_read:
     jz .try_again   ; try again if not ready
 
     ; Read 256 words (512 bytes) at a time
-    mov ecx, 256
-    mov edx, 0x1F0
-    rep insw
-    pop ecx
-    loop .next_sector
+    mov ecx, 256    ; set number of byte to read (256*2 = 512)
+    mov edx, 0x1F0  ; mov 0x1F0 data port into edx (reading from this port into memory)
+    rep insw        ; rep = repeat next instruction ECX time (256) 
+                    ; insw = read word (2 bytes) from port DX (disk) to the memory location at [EDI] (EDI = 0x0100000) and increase EDI accordingly.
+                    ; 
+    pop ecx         ; restore the original sector counter from the stack
+    loop .next_sector   ; decrease ECX, if ECX != 0 -> jmp to .next_sector
     ret
 
 ; Filling the remain bytes to 0
