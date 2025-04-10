@@ -3,8 +3,9 @@
 - This file contains step by step guideline.
 - The source code is tested on Debian 12.10.0 AMD64
 
-## Progresss Diagram
-![progress.png](./assets/progress.png)
+## Flowchart
+
+![progress.png](../guides/assets/flow-diagram.svg)
 
 ## 0. Starting Setup
 ### 0.1 Install gcc

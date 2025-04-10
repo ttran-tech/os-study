@@ -1,4 +1,5 @@
 # Peach OS
 
-## Process
-![progress.png](../guides/assets/progress.png)
+### Flowchart
+
+![progress.png](../guides/assets/flow-diagram.svg)
