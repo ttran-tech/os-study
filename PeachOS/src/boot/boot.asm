@@ -105,7 +105,7 @@ load_kernel:
     ;   0: bootloader
     ;   1: second sector
     mov eax, 1          ; load LBA number sector into EAX (second sector - kernel code)
-    mov ecx, 100        ; total sectors to read, bytes = 512 * 100 = 51,200 bytes loaded
+    mov ecx, 100        ; total number of sectors to read, bytes = 512 * 100 = 51,200 bytes loaded (ECX = sector count)
     mov edi, 0x0100000  ; the address in memory to load the sectors into
     call ata_lba_read
     ; Once the sectors loaded, jump to where the kernel was loaded
@@ -171,14 +171,14 @@ ata_lba_read:
 
     ; Read all sectors into memory
 .next_sector:
-    push ecx
+    push ecx    ; temporary saves sector count to the stack
 
     ; Check for READ status from disk
 .try_again:
-    mov dx, 0x1F7
-    in al, dx
-    test al, 8
-    jz .try_again
+    mov dx, 0x1F7   ; set status port of ATA (hard drive)
+    in al, dx       ; read status into AL
+    test al, 8      ; test the 3rd bit (bit 3 = DRQ "data request")
+    jz .try_again   ; try again if not ready
 
     ; Read 256 words (512 bytes) at a time
     mov ecx, 256
