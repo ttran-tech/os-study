@@ -1,5 +1,6 @@
 [BITS 32]
 global _start
+extern kernel_main ; notify NASM kernel_main is a external function
 
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
@@ -24,27 +25,9 @@ _start:
     or al, 2
     out 0x92, al
 
-    mov esi, msg
-    mov ah, [msg_color]
-    call print_string
+    call kernel_main ; call kernel_main which defined in C code
 
     jmp $
 
-print_string:
-    mov edi, VGA_MEMORY
-    .print_char:
-        lodsb
-        cmp al, 0
-        je .done
-        mov [edi], al
-        mov byte [edi+1], ah
-        add edi, 2
-        jmp .print_char
-    .done:
-        ret
-
-
-msg: db "Hello World, Kernel! ", 0
-msg_color: db 0x2F
-
-times 512 - ($ - $$) db 0 ; add sector boundary, padding the rest of kernel sector with 0 to match 512 bytes each sector
+; add sector boundary, padding the rest of kernel sector with 0 to match 512 bytes each sector
+times 512 - ($ - $$) db 0 
