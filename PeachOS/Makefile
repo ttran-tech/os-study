@@ -1,6 +1,8 @@
 # Defines a variables FILES containing the objects files to be linked
 # together to form the kernel binary.
-FILES = ./build/kernel.asm.o
+FILES = ./build/kernel.asm.o ./build/kernel.o
+INCLUDES = -I./src
+FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -fno-builtin -Wno-unused-function -Wno-unused-label -Wno-unused-paramater -Werror -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
 ###############################################################################
 # Syntax
@@ -36,7 +38,7 @@ all: ./bin/boot.bin ./bin/kernel.bin
 # -ffreestanding: freestanding code (not hosted by an OS).
 # -O0: no optimize.
 # -nostdlib: no link to standard libraries.
-	i686-elf-gcc -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
+	i686-elf-gcc $(FLAGS) -T ./src/linker.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/kernelfull.o
 
 # Build the boot sector binary
 ./bin/boot.bin: ./src/boot/boot.asm
@@ -47,13 +49,16 @@ all: ./bin/boot.bin ./bin/kernel.bin
 # -f elf: tells NASM to ouput in the ELF format (Executable and Linkable Format)
 	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.o
 
+./build/kernel.o: ./src/kernel.c
+	i686-elf-gcc $(INCLUDES) $(FLAGS) -std=gnu99 -c ./src/kernel.c -o ./build/kernel.o
+
 # clean up build
 clean:
 	rm -rf ./bin/boot.bin
 	rm -rf ./bin/kernel.bin
 	rm -rf ./bin/os.bin
 	rm -rf $(FILES)
-	rm -rf ./build/kernel.asm.o
+	rm -rf ./build/kernelfull.o
 	
 # run
 run:
@@ -62,6 +67,7 @@ run:
 # run qemu with remote dbg
 dbg:
 	qemu-system-x86_64 -s -S -hda ./bin/os.bin
+
 
 # gdb internal debug
 # target remote | qemu-system-x86_64 -S -gdb stdio -hda ./bin/os.bin
