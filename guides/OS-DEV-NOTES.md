@@ -163,6 +163,36 @@
 ### :large_blue_diamond: FLAGS (4 bits) or Limit High + FLAGS (8 bits)
 
 ---
+## Global Descriptor Table Register (GDTR)
+- **Global Descriptor Table Register (GDTR)** is a special CPU register that stores:
+  - The **base address** of the Global Descriptor Table (GDT)
+  - The size (limit) of the GDT in bytes (minus 1)
+
+### :large_blue_diamond: Purpose of GDTR
+- When switching to Protected Mode, the CPU needs to know:
+  - Where the GDT is in memory
+  - How big it is so the CPU can look up **segment descriptor** (for code, data, stack, etc)
+
+→ The GDTR tells the CPU where to find GDT 
+
+### :large_blue_diamond: GDTR Structure (6 bytes total)
+
+| Bytes| Field| Description|
+|---|---|---|
+| 0-1| Limit| Size of GDT in bytes - 1 (max 65535)|
+| 2-5| Base| 32-bit linear address of the GDT|
+
+### :large_blue_diamond: Load GDTR in NASM
+
+```Assembly
+lgdt [gdt] ; load [gtd] to the GDTR CPU register
+
+gdt:
+  dw gtd_end - gdt_start - 1 ; size / limit of the GDT
+  dd gtd_start ; Base address of the GDT
+```
+
+---
 ## Enable A20 Line
 
 - The **A20 Line** is the 21st address line on x86 CPUs which allows access to memory above 1 MB (0xFFFFF).
