@@ -82,7 +82,7 @@
 - In GDT, segment limit is 20 bits entry and split into:
     1. Lower 16 bits → LIMIT LOW (bit range: 0-15)
     2. Upper 4 bits → LIMIT HIGH (bit range: 48-51) *This field is combine with FLAGS field and makes up an 8-bit field total*
-- **How Granularity (G bit) affects Segment Limit?
+- How Granularity (G bit) affects Segment Limit?
   - If G = 0: limit is in bytes → max size = ~1 MB
   - If G = 1: limit is in 4 KB block → max size = ~ 4 GB
 
