@@ -560,3 +560,81 @@ db 0 = Padding the sector with exactly 512 bytes
 ### :large_blue_diamond: Visualize
 
 ![memory alignment](./assets/memory-alignment.PNG)
+
+---
+## Interrupt Descriptor Table (IDT)
+### :large_blue_diamond: What is the IDT?
+- The IDT is a table in memory that defines how the CPU should handle interrupts, exceptions, and hardware interrupts.
+
+- It tells the CPU what interrupt service routine (ISR) to call when an interrupt or exception occurs.
+
+### :large_blue_diamond: Why Is the IDT Essential in OS Development?
+- Interrupt Handling:
+  - The IDT is used by the CPU to dispatch interrupts, which are essential for handling things like timer ticks, keyboard input, and exceptions (e.g., divide-by-zero).
+
+- System Stability:
+  - Without a proper IDT, the OS cannot properly manage or recover from hardware and software faults.
+
+- Control Flow:
+  - Setting an IDT is a prerequisite for implementing multitasking and other advanced OS features.
+
+### :large_blue_diamond: IDT Entry Structure (for 32-bit Protected Mode)
+- Each entry in the IDT is 8-bytes long
+
+| Field | Size (Bits) | Description |
+|---|---|---|
+| Offset Low | 16 | Lower 16 bits of the ISR address |
+| Selector | 16 | Code Segment Selector (from GDT) |
+| Reserved | 8 | Usually zero |
+| Type/Attribute | 8 | Gate Type, DPL, Present Flag, etc. |
+| Offset High | 16 | Upper 16 bits of the ISR address |
+
+- Fields in Type/Attribute Byte:
+
+| Bits | Size (Bits) |Type/Attribute | Description |
+|---|---|---|---|
+| 7 | 1 |P (Present) | Must be set to 1 if the descriptor is valid. |
+| 6-5 | 2 | DPL (Descriptor Privilege Level) | Indicates the minimum privilege level required to invoke this interrupt (0: kernel, 3: user-mode).|
+| 4 | 1 | S (Storage Segment) | Always 0 for system segments like interrupt gates.
+| 3-0 | 4 | Gate Type | Indicates the type of gate:<br> <ul><li>`0xE` (14, binary `1110`) for a 32-bit interrupt gate (most common)</li><li>`0xF` (15, binary `1111`) for a 32-bit trap gate (similar to an interrupt gate but does not clear the interrupt flag on entry).</li></ul>|
+
+
+- Example for an interrupt gate with Type/Attr of `0x8E` (1000 11110):
+  - P = 1
+  - DPL = 00
+  - S = 0
+  - Type = 1110 (0xE)
+
+### :large_blue_diamond: How the CPU Uses the IDT?
+1. Loading the IDT:
+    - The CPU uses a special register called the IDTR (Interrupt Descriptor Table Regiser).
+      - You set up your IDT in memory and load the IDT's base address and limit into the IDTR using `lidt` instruction.
+      - The structure of the IDTR is similar to the GDTR:
+
+      ```Assembly
+      ; define the IDT limit and base address
+      idt:
+        dw idt_size - 1 ; Limit: size of the IDT - 1
+        dd idt_base     ; Base Address: the starting address of the IDT
+
+      ; load the IDT into CPU register (IDTR)
+      lidt [idt]
+      ```
+2. Interrupt Processing:
+    - When the interrupt occurs, the CPU does the following tasks:
+      - Use the interrupt vector (a number between 0 and 255) as an index into the IDT.
+      - Retrieves the corresponding 8-byte entry.
+      - Extract the ISR address by combining the Offset Low and Offset High.
+      - Loads the code segment from the Selector field.
+      - Jumps to that ISR with the appropriate privilege level based on the Type/Attr field.
+
+#### :small_red_triangle_down: Detail Explanation:
+**1. What is the ISR?**
+- ISR (Interrupt Service Routine) is the routine (or function) that the CPU jumps to when a specific interrupt occurs.
+- Purpose:
+  - Handle the interrupt or exception (timeer tick, keyboard input, or a fault like division-by-zero).
+- Location:
+  - The ISR code is placed in memory, either written in assembly or C (with assembly wrappers).
+
+**2. How the ISR Fits in:**
+- The IDT entry for an interrupt contains the address of the ISR (Offset Low/Offset High) and a Selector that tells the CPU which code segment (defined in the GDT) the ISR lives in.
