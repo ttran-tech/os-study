@@ -31,7 +31,7 @@ DATA_SEG equ gdt_data - gdt_start
 
 load_protected:
     cli ; disable interrupt
-    lgdt[gtd_descriptor] ; loads the address and size of GDT into the CPU’s internal GDTR register
+    lgdt[gtd] ; loads the GDT into the CPU’s internal register (GDTR)
 
     ; switch to Protected Mode
     mov eax, cr0
@@ -66,10 +66,10 @@ gdt_data:
 gdt_end:
     ; pass
 
-; Define the size and starting point of GDT
-gtd_descriptor:
+; Define the limit and base address of GDT
+gtd:
     dw gdt_end - gdt_start - 1 ; Size of GDT (Limit)
-    dd gdt_start    ; Linear address of GDT (Base)
+    dd gdt_start    ; Base address of GDT (the starting address of the GDT)
 
 [BITS 32]
 load32:
