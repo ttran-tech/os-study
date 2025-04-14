@@ -683,3 +683,24 @@ When an interrupt occurs, the CPU does the following:
 - **Returning from the ISR:**
   - At the end of the ISR, the code executes an **IRET instruction** (Interrupt Return).
   - **IRET** pops the previously saved registers (like CS, IP, or EFLAGS) from the stack, restoring the state to resume the interrupted task.
+
+### :star: Side Notes:
+- The selector from the IDT is not the segment base, it's an index into the GDT.
+- Formular to convert from IDT Selector to GDT Index:
+```
+GDT Index = IDT Selector >> 3
+```
+
+| GDT Index | IDT Selector | Segment Type |
+|---|---|---|
+| 0 | 0x00 | Null |
+| 1 | 0x08 | Code Segment |
+| 2 | 0x10 | Data Segment|
+
+- Selector Format:
+
+| Bits | Name |
+|---|---|
+|15-3 | Index into GDT or LGT |
+|2 | TI (Table Indicator), 0 = GTD, 1 = LDT |
+|1-0| RPL (Requested Privilege Level) |
