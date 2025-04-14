@@ -669,7 +669,7 @@ When an interrupt occurs, the CPU does the following:
     - **Then:** It starts executing the ISR code at that calculated address.
 
 **3. What Happens Once the CPU Jumps to the ISR?**
-- **Eexecute ISR Code:**
+- **Execute ISR Code:**
   - Once the CPU jumps to the ISR, it executes the insructions in that routine.
   - The ISR will:
     - Perform the necessary operations to handle the interrupt.
