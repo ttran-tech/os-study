@@ -623,12 +623,12 @@ db 0 = Padding the sector with exactly 512 bytes
 2. Interrupt Processing:
     - When the interrupt occurs, the CPU does the following tasks:
       - Use the interrupt vector (a number between 0 and 255) as an index into the IDT.
-      - Retrieves the corresponding 8-byte entry.
+      - Retrieves the corresponding 8-byte entry from the IDT.
       - Extract the ISR address by combining the Offset Low and Offset High.
       - Loads the code segment from the Selector field.
       - Jumps to that ISR with the appropriate privilege level based on the Type/Attr field.
 
-#### :small_red_triangle_down: Detail Explanation:
+### :star: Further Explain:
 **1. What is the ISR?**
 - ISR (Interrupt Service Routine) is the routine (or function) that the CPU jumps to when a specific interrupt occurs.
 - Purpose:
@@ -636,5 +636,50 @@ db 0 = Padding the sector with exactly 512 bytes
 - Location:
   - The ISR code is placed in memory, either written in assembly or C (with assembly wrappers).
 
-**2. How the ISR Fits in:**
+**- How the ISR Fits in:**
 - The IDT entry for an interrupt contains the address of the ISR (Offset Low/Offset High) and a Selector that tells the CPU which code segment (defined in the GDT) the ISR lives in.
+
+**2. How the CPU Uses the IDT to Call an ISR**
+
+When an interrupt occurs, the CPU does the following:
+
+  - **2.1 Interrupt Vector Index:** (Defined by developer when creating/declaring the IDT entry)
+    - It uses the interrupt number (0 to 255) as an index into the IDT to retrieve the corresponding entry.
+  
+  - **2.2 The IDT Entry Contains:** *(Defined by developer in either C or Assembly).*
+    - **Offset Low (16 bits)**: Lower part of the ISR address.
+    - **Selector (16 bits)**: Points to a code segment descriptor in the GDT.
+    - **Reserved (8 bits)**: Always zero.
+    - **Type/Attributes (8 bits)**: Contains the gate type (e.g., interrupt gate), privilege level (DPL), and a present bit.
+    - **Offset High (16 bits)**: Upper part of the ISR address.
+
+  - **2.3 Find ISR Address:**
+    - **Selector:**
+      - The CPU takes the selector from the IDT entry and uses it to find the corresponding code segment descriptor in the **GDT** *(defined before switching to Protected Mode)*.
+      - That descriptor provides the **base address** of the **code segment**.
+
+    - **Offset (Low & High):**
+      - The CPU combines the segment's base address with the offset (from the IDT entry) to compute the linear address of the ISR.
+
+  - **2.4 State Saving:**
+    - Before transferring control, the CPU typically pushes the current state (registers, flags, etc.) onto the stack.
+  
+  - **2.5 Jumping to the ISR:**
+    - The CPU performs a far jump, updating CS (Code Segment Register) with the selector (Code Segment Based Address) and IP/EIP with the offset from the IDT entry.
+    - **Then:** It starts executing the ISR code at that calculated address.
+
+**3. What Happens Once the CPU Jumps to the ISR?**
+- **Eexecute ISR Code:**
+  - Once the CPU jumps to the ISR, it executes the insructions in that routine.
+  - The ISR will:
+    - Perform the necessary operations to handle the interrupt.
+    - Usually communicate with hardware (if needed), clear the interrupt, or process error conditions.
+
+  - Example Tasks:
+    - Read input from a keyboard buffer.
+    - Processing a timer tick.
+    - Handling a fault or execption.
+
+- **Returning from the ISR:**
+  - At the end of the ISR, the code executes an **IRET instruction** (Interrupt Return).
+  - **IRET** pops the previously saved registers (like CS, IP, or EFLAGS) from the stack, restoring the state to resume the interrupted task.
