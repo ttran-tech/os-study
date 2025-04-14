@@ -584,7 +584,7 @@ db 0 = Padding the sector with exactly 512 bytes
 | Field | Size (Bits) | Description |
 |---|---|---|
 | Offset Low | 16 | Lower 16 bits of the ISR address |
-| Selector | 16 | Code Segment Selector (from GDT) |
+| Selector | 16 | A value holding the index (GDT/LDT), TI (GDT/LDT), RPL<br>Used to identify a segment in GDT/LDT entry. |
 | Reserved | 8 | Usually zero |
 | Type/Attribute | 8 | Gate Type, DPL, Present Flag, etc. |
 | Offset High | 16 | Upper 16 bits of the ISR address |
