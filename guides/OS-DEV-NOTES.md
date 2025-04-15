@@ -754,7 +754,7 @@ Accessed: 2025-04-15
 [https://wiki.osdev.org/Cross-Compiler_Successful_Builds](https://wiki.osdev.org/Cross-Compiler_Successful_Builds)<br>
 Accessed: 2025-04-15
 
-[Book] **Developing a Multi-threaded Kernel From Scratch** - McCarthy Daniel, Vol.1 & 2
+[Book] **Developing a Multi-threaded Kernel From Scratch** - McCarthy Daniel, Vol.1 & 2<br>
 Pages: 72-91
 
 [Site] **Interrupts, IDT, ISR and IRQ** - thejat.in <br>
