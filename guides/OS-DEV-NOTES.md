@@ -706,5 +706,6 @@ GDT Index = IDT Selector >> 3
 |1-0| RPL (Requested Privilege Level) |
 
 ## :star: Diagram
-
+- The flowchart below is to illustrate how interrupts being handled by the CPU.
+  
 ![IDT Process](./diagram/OsDev-IDT%20Process.drawio.png)
