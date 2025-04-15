@@ -579,7 +579,12 @@ db 0 = Padding the sector with exactly 512 bytes
   - Setting an IDT is a prerequisite for implementing multitasking and other advanced OS features.
 
 ### :large_blue_diamond: IDT Entry Structure (for 32-bit Protected Mode)
-- Each entry in the IDT is 8-bytes long
+- Each entry in the IDT is called a **gate** OR **Interrupt Descriptor** and 8-bytes long on 32-bit processor.
+- The IDT consits of 256 gates.
+- *The first 32 (0-31) entries are used for processor exceptions.*
+
+![image](https://github.com/user-attachments/assets/0849e4a9-7496-4791-8e58-72eac962b169)
+
 
 | Field | Size (Bits) | Description |
 |---|---|---|
@@ -604,6 +609,25 @@ db 0 = Padding the sector with exactly 512 bytes
   - DPL = 00
   - S = 0
   - Type = 1110 (0xE)
+
+### :large_blue_diamond: IDTR?
+- The location of the IDT is stored in the IDT Register (IDTR), which is loaded using the LIDT (Load IDT) instruction.
+- The IDTR is a 48-bit register in 32-bit mode & 80-bit in 64-bit mode:
+    -   The first 16 bits contain the size (or limit) of the IDT in bytes minus one.
+    -   The remaining 32 bits (in 32-bit mode) or 64 bits (in 64-bit mode) contain the base address of the IDT.
+
+```
++-------------------------+
+|  Limit (Size - 1)       |  (16 bits)
++-------------------------+
+|  Base Address           |  (32 bits in 32-bit mode, | 64 bits in 64-bit mode) |
++-------------------------+
+
+Limit: Specifies the size of the IDT in bytes minus one.
+Base Address: The starting address of the IDT.
+
+Note that the amount of data loaded by LIDT differs in 32-bit and 64-bit modes, Offset is 4 bytes long in 32-bit mode and 8 bytes long in 64-bit mode.
+```
 
 ### :large_blue_diamond: How the CPU Uses the IDT?
 1. Loading the IDT:
@@ -709,3 +733,7 @@ GDT Index = IDT Selector >> 3
 - The flowchart below is to illustrate how interrupts being handled by the CPU.
   
 ![IDT Process](./diagram/OsDev-IDT%20Process.drawio.png)
+
+
+## :page_with_curl: References
+- **Interrupts, IDT, ISR and IRQ** - thejat.in [https://www.thejat.in/learn/interrupts-idt-isr-and-irq](https://www.thejat.in/learn/interrupts-idt-isr-and-irq)
