@@ -628,6 +628,8 @@ Base Address: The starting address of the IDT.
 
 Note that the amount of data loaded by LIDT differs in 32-bit and 64-bit modes, Offset is 4 bytes long in 32-bit mode and 8 bytes long in 64-bit mode.
 ```
+- Example:
+![image](https://github.com/user-attachments/assets/ce170724-1895-4bb9-a389-d31c7ff8db73)
 
 ### :large_blue_diamond: How the CPU Uses the IDT?
 1. Loading the IDT:
@@ -736,4 +738,25 @@ GDT Index = IDT Selector >> 3
 
 
 ## :page_with_curl: References
-- **Interrupts, IDT, ISR and IRQ** - thejat.in [https://www.thejat.in/learn/interrupts-idt-isr-and-irq](https://www.thejat.in/learn/interrupts-idt-isr-and-irq)
+[Site] **Setting Up GDT** - thejat.in<br>
+[https://www.thejat.in/learn/setting-up-gdt](https://www.thejat.in/learn/setting-up-gdt)<br>
+Accessed: 2025-03-22
+
+[Site] **A20 Line** - OSDev Wiki<br>
+[https://wiki.osdev.org/A20_Line#Fast_A20_Gate](https://wiki.osdev.org/A20_Line#Fast_A20_Gate)<br>
+Accessed: 2025-04-15
+
+[Site] **Cross Compiler** - OSDev Wiki<br>
+[https://wiki.osdev.org/GCC_Cross-Compiler](https://wiki.osdev.org/GCC_Cross-Compiler)<br>
+Accessed: 2025-04-15
+
+[Site] **Cross-Compiler Successful Builds** - OSDev Wiki<br>
+[https://wiki.osdev.org/Cross-Compiler_Successful_Builds](https://wiki.osdev.org/Cross-Compiler_Successful_Builds)<br>
+Accessed: 2025-04-15
+
+[Book] **Developing a Multi-threaded Kernel From Scratch** - McCarthy Daniel, Vol.1 & 2
+Pages: 72-91
+
+[Site] **Interrupts, IDT, ISR and IRQ** - thejat.in <br>
+[https://www.thejat.in/learn/interrupts-idt-isr-and-irq](https://www.thejat.in/learn/interrupts-idt-isr-and-irq)<br>
+Accessed: 2025-04-15
