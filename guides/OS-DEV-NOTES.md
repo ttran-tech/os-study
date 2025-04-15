@@ -704,3 +704,7 @@ GDT Index = IDT Selector >> 3
 |15-3 | Index into GDT or LGT |
 |2 | TI (Table Indicator), 0 = GTD, 1 = LDT |
 |1-0| RPL (Requested Privilege Level) |
+
+## :star: Diagram
+
+![IDT Process](./diagram/OsDev-IDT%20Process.drawio.svg)
