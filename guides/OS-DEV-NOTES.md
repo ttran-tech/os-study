@@ -707,4 +707,4 @@ GDT Index = IDT Selector >> 3
 
 ## :star: Diagram
 
-![IDT Process](./diagram/OsDev-IDT%20Process.drawio.svg)
+![IDT Process](./diagram/OsDev-IDT%20Process.drawio.png)
