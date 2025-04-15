@@ -629,6 +629,7 @@ Base Address: The starting address of the IDT.
 Note that the amount of data loaded by LIDT differs in 32-bit and 64-bit modes, Offset is 4 bytes long in 32-bit mode and 8 bytes long in 64-bit mode.
 ```
 - Example:
+
 ![image](https://github.com/user-attachments/assets/ce170724-1895-4bb9-a389-d31c7ff8db73)
 
 ### :large_blue_diamond: How the CPU Uses the IDT?
