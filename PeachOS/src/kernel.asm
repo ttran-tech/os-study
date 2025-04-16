@@ -4,7 +4,6 @@ extern kernel_main ; notify NASM kernel_main is a external function
 
 CODE_SEGMENT equ 0x08 
 DATA_SEGMENT equ 0x10
-VGA_MEMORY equ 0xB8000
 
 _start:
     mov ax, DATA_SEGMENT ; Setting up segment registers to poin to DATA_SEG
