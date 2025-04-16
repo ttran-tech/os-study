@@ -2,12 +2,12 @@
 global _start
 extern kernel_main ; notify NASM kernel_main is a external function
 
-CODE_SEG equ 0x08
-DATA_SEG equ 0x10
+CODE_SEGMENT equ 0x08 
+DATA_SEGMENT equ 0x10
 VGA_MEMORY equ 0xB8000
 
 _start:
-    mov ax, DATA_SEG ; Setting up segment registers to poin to DATA_SEG
+    mov ax, DATA_SEGMENT ; Setting up segment registers to poin to DATA_SEG
     ; load all data segment register with DATA_SEG selector
     mov ds, ax
     mov es, ax

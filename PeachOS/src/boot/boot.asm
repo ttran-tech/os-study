@@ -26,8 +26,9 @@ registers_reset_step2:
     ret
 
 ; =================== PROTECTED MODE SETTING ========================================
-CODE_SEG equ gdt_code - gdt_start
-DATA_SEG equ gdt_data - gdt_start
+; Define the segment base in the GDT
+CODE_SEGMENT equ gdt_code - gdt_start
+DATA_SEGMENT equ gdt_data - gdt_start
 
 load_protected:
     cli ; disable interrupt
@@ -37,7 +38,7 @@ load_protected:
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
-    jmp CODE_SEG:load32
+    jmp CODE_SEGMENT:load32
 
 ; Setting up Global Descriptor Table (GDT)
 gdt_start:
@@ -110,9 +111,9 @@ load_kernel:
     call ata_lba_read
     ; Once the sectors loaded, jump to where the kernel was loaded
     ; and execute the kernel.asm file.
-    ; CODE_SEG ensures the CS register becomes the code selector specified in the GDT
+    ; CODE_SEGMENT ensures the CS register becomes the code selector specified in the GDT
     ; enforcing the GDT code rules for execution.
-    jmp CODE_SEG:0x0100000
+    jmp CODE_SEGMENT:0x0100000
 
 ata_lba_read:
     mov ebx, eax    ; backup the LBA
