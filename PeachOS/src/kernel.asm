@@ -1,5 +1,6 @@
 [BITS 32]
 global _start
+global problem
 extern kernel_main ; notify NASM kernel_main is a external function
 
 CODE_SEGMENT equ 0x08 
@@ -27,6 +28,17 @@ _start:
     call kernel_main ; call kernel_main which defined in C code
 
     jmp $
+
+; This function will be called from kernel.c to trigger the interrupt 0 (divide by zero exception)
+problem:
+    push ebp
+    mov esp, ebp
+
+    mov eax, 0
+    div eax
+
+    pop ebp
+    ret
 
 ; add sector boundary, padding the rest of kernel sector with 0 to match 512 bytes each sector
 times 512 - ($ - $$) db 0 
