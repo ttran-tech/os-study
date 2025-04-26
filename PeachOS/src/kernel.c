@@ -7,6 +7,11 @@ uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
 uint16_t terminal_col = 0;
 
+// Import external function from kernel.asm
+
+// This function is to trigger int 0 (divide by zero exception)
+extern void problem();
+
 // Merge character and color code
 uint16_t terminal_make_char(char c, char color) 
 {
@@ -79,8 +84,8 @@ void kernel_main()
 {
     terminal_init();
     print("\n Welcome to PeachOS.\n A greeting message from the kernel.\n");
-    print("\n Hello World!");
+    print("\n Hello World!\n");
 
     idt_init();
-
+    problem();
 }
